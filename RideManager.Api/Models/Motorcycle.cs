@@ -16,7 +16,7 @@ public class Motorcycle
 
     public int OwnerId { get; set; }
 
-    public Owner Owner { get; set; } = null!;
+    public Owner? Owner { get; set; } 
 
 
     public List<WorkOrder> WorkOrders { get; set; } = new();

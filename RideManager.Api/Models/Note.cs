@@ -11,5 +11,5 @@ public class Note
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public int WorkOrderId { get; set; }
-    public WorkOrder WorkOrder { get; set; } = null!;
+    public WorkOrder?WorkOrder { get; set; }
 }

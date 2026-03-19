@@ -19,9 +19,9 @@ public class WorkOrder
     public decimal Cost { get; set; }
     public List<Note> Notes { get; set; } = new();
     public int MotorcycleId { get; set; } 
-    public Motorcycle Motorcycle { get; set; } = null!;
+    public Motorcycle? Motorcycle { get; set; } 
     public int MechanicId { get; set; }
-    public Mechanic Mechanic { get; set; } = null!;
+    public Mechanic? Mechanic { get; set; } 
 
 
 }
