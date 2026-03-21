@@ -2,6 +2,7 @@
 using RideManager.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using RideManager.Api.Data;
+using RideManager.Api.DTOs;
 
 namespace RideManager.Api.Controllers;
 
@@ -17,11 +18,21 @@ public class OwnersController : ControllerBase
         _context = context;
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Owner>>> GetOwners()
+    public async Task<ActionResult<IEnumerable<OwnerResponseDto>>> GetOwners()
     {
-        return await _context.Owners
-            .Include(o => o.Motorcycles)
-            .ToListAsync();
+        var owners = await _context.Owners
+        .Include(o => o.Motorcycles)
+        .ToListAsync();
+
+        return owners.Select(o => new OwnerResponseDto
+        {
+            Id = o.Id,
+            FullName = $"{o.FirstName} {o.LastName}",
+            Phone = o.Phone,
+            Email = o.Email,
+            LicensePlates = o.Motorcycles.Select(m => m.LicensePlate).ToList()
+        }).ToList();
+
     }
     [HttpPost]
     public async Task<ActionResult<Owner>> CreateOwner(Owner owner)
