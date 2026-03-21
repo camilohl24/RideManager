@@ -43,7 +43,7 @@ public class OwnersController : ControllerBase
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Phone = dto.Phone,
-            Email = dto.Email,
+            Email = dto.Email
         };
         _context.Owners.Add(owner);
         await _context.SaveChangesAsync();
