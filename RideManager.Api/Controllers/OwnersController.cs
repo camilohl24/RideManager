@@ -35,34 +35,58 @@ public class OwnersController : ControllerBase
 
     }
     [HttpPost]
-    public async Task<ActionResult<Owner>> CreateOwner(Owner owner)
+    public async Task<ActionResult<OwnerResponseDto>> CreateOwner(OwnerRequestDto dto)
     {
+
+        var owner = new Owner
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Phone = dto.Phone,
+            Email = dto.Email,
+        };
         _context.Owners.Add(owner);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetOwners), new { id = owner.Id }, owner);
+        return new OwnerResponseDto
+        {
+            Id = owner.Id,
+            FullName = $"{owner.FirstName} {owner.LastName}",
+            Phone = owner.Phone,
+            Email = owner.Email,
+            LicensePlates = []
+        };
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Owner>> GetOwner(int id)
+    public async Task<ActionResult<OwnerResponseDto>> GetOwner(int id)
     {
         var owner = await _context.Owners
             .Include(o => o.Motorcycles)
             .FirstOrDefaultAsync(o => o.Id == id);
         if (owner == null)
             return NotFound();
-        return owner;
+        return new OwnerResponseDto 
+        { Id = owner.Id, 
+            FullName = $"{owner.FirstName} {owner.LastName}", 
+            Phone = owner.Phone, 
+            Email = owner.Email,
+            LicensePlates = [.. owner.Motorcycles.Select(m => m.LicensePlate)] 
+        };
     }
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateOwner (int id, Owner owner)
+    public async Task<IActionResult> UpdateOwner (int id, OwnerRequestDto dto)
     {
-        if(id != owner.Id)
-           return BadRequest();
-        _context.Entry(owner).State = EntityState.Modified;
+        var owner = await _context.Owners.FindAsync(id);
+        if (owner == null)
+            return NotFound();
+        owner.FirstName = dto.FirstName;
+        owner.LastName = dto.LastName;
+        owner.Email = dto.Email;
+        owner.Phone = dto.Phone;
         await _context.SaveChangesAsync();
         return NoContent();
-        
     }
 
     [HttpDelete("{id}")]
