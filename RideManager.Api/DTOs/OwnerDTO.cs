@@ -5,15 +5,18 @@ namespace RideManager.Api.DTOs;
 public class OwnerResponseDto
 {
     public int Id { get; set; }
+    public string DocumentId { get; set; } = null!;
     public string FullName { get; set; } = null!;
     public string Phone { get; set; } = null!;
     public string Email { get; set; }= null!;
-    public List<string> LicensePlates { get; set; }
+    public List<string>? LicensePlates { get; set; }
 
 }
 
 public class OwnerRequestDto
 {
+    [Required]
+    public string DocumentId { get; set; } = null!;
     [Required]
     public string FirstName { get; set; } = null!;
     [Required]

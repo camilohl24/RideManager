@@ -24,6 +24,7 @@ public class MechanicsController : ControllerBase
         return mechanics.Select(m => new MechanicResponseDto
         {
             Id = m.Id,
+            DocumentId = m.DocumentId,
             FullName = $"{m.FirstName} {m.LastName}",
             Phone = m.Phone,
             Email = m.Email,
@@ -35,6 +36,7 @@ public class MechanicsController : ControllerBase
     {
         var mechanic = new Mechanic
         {
+            DocumentId = dto.DocumentId,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Phone = dto.Phone,
@@ -48,6 +50,7 @@ public class MechanicsController : ControllerBase
         return new MechanicResponseDto
         {
             Id = mechanic.Id,
+            DocumentId =mechanic.DocumentId,
             FullName = $"{mechanic.FirstName} {mechanic.LastName}",
             Phone = mechanic.Phone,
             Email = mechanic.Email,
@@ -64,6 +67,7 @@ public class MechanicsController : ControllerBase
         return  new MechanicResponseDto
         {
             Id = mechanic.Id,
+            DocumentId=mechanic.DocumentId,
             FullName = $"{mechanic.FirstName} {mechanic.LastName}",
             Phone = mechanic.Phone,
             Email = mechanic.Email,
@@ -78,6 +82,7 @@ public class MechanicsController : ControllerBase
         var mechanic = await _context.Mechanics.FindAsync(id);
         if (mechanic == null)
             return NotFound();
+        mechanic.DocumentId = dto.DocumentId;
         mechanic.FirstName = dto.FirstName;
         mechanic.LastName = dto.LastName;
         mechanic.Phone = dto.Phone;

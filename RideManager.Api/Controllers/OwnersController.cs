@@ -27,6 +27,7 @@ public class OwnersController : ControllerBase
         return owners.Select(o => new OwnerResponseDto
         {
             Id = o.Id,
+            DocumentId = o.DocumentId,
             FullName = $"{o.FirstName} {o.LastName}",
             Phone = o.Phone,
             Email = o.Email,
@@ -40,6 +41,7 @@ public class OwnersController : ControllerBase
 
         var owner = new Owner
         {
+            DocumentId = dto.DocumentId,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Phone = dto.Phone,
@@ -50,10 +52,11 @@ public class OwnersController : ControllerBase
         return new OwnerResponseDto
         {
             Id = owner.Id,
+            DocumentId= owner.DocumentId,
             FullName = $"{owner.FirstName} {owner.LastName}",
             Phone = owner.Phone,
             Email = owner.Email,
-            LicensePlates = []
+            LicensePlates = owner.Motorcycles.Select(m => m.LicensePlate).ToList()
         };
     }
 
@@ -66,11 +69,12 @@ public class OwnersController : ControllerBase
         if (owner == null)
             return NotFound();
         return new OwnerResponseDto 
-        { Id = owner.Id, 
+        {   Id = owner.Id, 
+            DocumentId = owner.DocumentId,
             FullName = $"{owner.FirstName} {owner.LastName}", 
             Phone = owner.Phone, 
             Email = owner.Email,
-            LicensePlates = [.. owner.Motorcycles.Select(m => m.LicensePlate)] 
+            LicensePlates = owner.Motorcycles.Select(m => m.LicensePlate).ToList()
         };
     }
 
@@ -81,6 +85,7 @@ public class OwnersController : ControllerBase
         var owner = await _context.Owners.FindAsync(id);
         if (owner == null)
             return NotFound();
+        owner.DocumentId = dto.DocumentId;
         owner.FirstName = dto.FirstName;
         owner.LastName = dto.LastName;
         owner.Email = dto.Email;

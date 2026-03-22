@@ -2,12 +2,13 @@
 using RideManager.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using RideManager.Api.Data;
+using RideManager.Api.DTOs;
 
 namespace RideManager.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MotorcyclesController: ControllerBase
+public class MotorcyclesController : ControllerBase
 {
     private readonly AppDbContext _context;
 
@@ -17,15 +18,28 @@ public class MotorcyclesController: ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Motorcycle>>> GetMotorcycles()
+    public async Task<ActionResult<IEnumerable<MotorcycleResponseDto>>> GetMotorcycles()
     {
-        return await _context.Motorcycles
-            .Include(m => m.WorkOrders)
-            .Include(m => m.Owner)
-            .ToListAsync();
+        var motorcycle = await _context.Motorcycles
+         .Include(m => m.WorkOrders)
+         .Include(m => m.Owner)
+         .ToListAsync();
+
+        return motorcycle.Select(m => new MotorcycleResponseDto
+        {
+            Id = m.Id,
+            LicensePlate = m.LicensePlate,
+            Brand = m.Brand,
+            Model = m.Model,
+            Reference = m.Reference,
+            OwnerId = m.OwnerId,
+            OwnerName = $"{m.Owner.FirstName} {m.Owner.LastName}",
+            WorkOrdersId = m.WorkOrders.Select(w => w.Id).ToList()
+        }).ToList();
     }
+
     [HttpGet("{id}")]
-    public async Task<ActionResult<Motorcycle>> GetMotorcycle(int id)
+    public async Task<ActionResult<MotorcycleResponseDto>> GetMotorcycle(int id)
     {
         var motorcycle = await _context.Motorcycles
             .Include(m => m.WorkOrders)
@@ -35,23 +49,61 @@ public class MotorcyclesController: ControllerBase
         if (motorcycle == null)
             return NotFound();
 
-        return motorcycle;
+        return new MotorcycleResponseDto
+        { 
+            Id =motorcycle.Id,
+            LicensePlate = motorcycle.LicensePlate,
+            Brand = motorcycle.Brand,
+            Model=motorcycle.Model,
+            Reference = motorcycle.Reference,
+            OwnerId = motorcycle.OwnerId,
+            OwnerName = $"{motorcycle.Owner.FirstName} {motorcycle.Owner.LastName}",
+            WorkOrdersId = motorcycle.WorkOrders.Select(w => w.Id).ToList()
+        };
     }
 
     [HttpPost]
-    public async Task<ActionResult<Motorcycle>> CreateMotorcycle(Motorcycle motorcycle)
+    public async Task<ActionResult<MotorcycleResponseDto>> CreateMotorcycle(MotorcycleRequestDto dto)
     {
+        var motorcycle = new Motorcycle()
+        {
+            LicensePlate = dto.LicensePlate,
+            Brand = dto.Brand,
+            Model = dto.Model,
+            Reference = dto.Reference,
+            OwnerId = dto.OwnerId
+        };
+
         _context.Motorcycles.Add(motorcycle);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetMotorcycles), new { id = motorcycle.Id }, motorcycle);
+
+        await _context.Entry(motorcycle).Reference(m => m.Owner).LoadAsync();
+        return new MotorcycleResponseDto
+        {
+            Id = motorcycle.Id,
+            LicensePlate= motorcycle.LicensePlate,
+            Brand = motorcycle.Brand,
+            Model = motorcycle.Model,
+            Reference = motorcycle.Reference,
+            OwnerId= motorcycle.OwnerId,
+            OwnerName = $"{motorcycle.Owner.FirstName} {motorcycle.Owner.LastName}",
+            WorkOrdersId = motorcycle.WorkOrders.Select(w => w.Id).ToList()
+        };
     }
+    
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateMotorcycle(int id, Motorcycle motorcycle)
+    public async Task<IActionResult> UpdateMotorcycle(int id, MotorcycleRequestDto dto)
     {
-        if (id != motorcycle.Id)
-            return BadRequest();
-        _context.Entry(motorcycle).State = EntityState.Modified;
+        var motorcycle = await _context.Motorcycles.FindAsync(id);
+        if (motorcycle == null)
+            return NotFound();
+        motorcycle.LicensePlate = dto.LicensePlate;
+        motorcycle.Brand = dto.Brand;
+        motorcycle.Model = dto.Model;
+        motorcycle.Reference = dto.Reference;
+        motorcycle.OwnerId = dto.OwnerId;
+
         await _context.SaveChangesAsync();
         return NoContent();
     }

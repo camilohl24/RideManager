@@ -5,6 +5,7 @@ namespace RideManager.Api.DTOs
     public class MechanicResponseDto
     {
         public int Id { get; set; }
+        public string DocumentId { get; set; } = null!;
         public string FullName { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public string Email { get; set; } = null!;
@@ -14,6 +15,8 @@ namespace RideManager.Api.DTOs
 
     public class MechanicRequestDto
     {
+        [Required]
+        public string DocumentId { get; set; } = null!;
         [Required]
         public string FirstName { get; set; } = null!;
         [Required]

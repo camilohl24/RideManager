@@ -5,11 +5,12 @@ namespace RideManager.Api.Models;
 public class Owner
 {
     public int Id { get; set; }
-    [Required] 
+    [Required]
+    public string DocumentId { get; set; } = null!;
+    [Required]
     public string FirstName { get; set; } = null!;
     [Required] 
     public string LastName { get; set; } = null!;
-
     [Required]
     public string Phone { get; set; } = null!;
     [Required]
