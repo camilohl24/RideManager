@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RideManager.Api.Data;
+using RideManager.Api.DTOs;
 using RideManager.Api.Models;
 
 namespace RideManager.Api.Controllers;
@@ -17,43 +18,49 @@ public class NotesController : ControllerBase
         _context = context;
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
+    public async Task<ActionResult<IEnumerable<NoteResponseDto>>> GetNotes()
     {
-        return await _context.Notes
+        var note =  await _context.Notes
             .Include(n => n.WorkOrder)
             .ToListAsync();
+        return  note.Select(MapToDto).ToList();
     }
     [HttpPost]
-    public async Task<ActionResult<Note>> CreateNote(Note note)
+    public async Task<ActionResult<NoteResponseDto>> CreateNote(NoteRequestDto dto)
     {
+        var note = new Note()
+        {
+            Description = dto.Description,
+            WorkOrderId = dto.WorkOrderId,
+        };
+
         _context.Notes.Add(note);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetNotes), new { id = note.Id }, note);
+        await _context.Entry(note).Reference(n => n.WorkOrder).LoadAsync();
+        return MapToDto(note);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Note>> GetNote(int id)
+    public async Task<ActionResult<NoteResponseDto>> GetNote(int id)
     {
         var note = await _context.Notes
             .Include(n => n.WorkOrder)
             .FirstOrDefaultAsync(n => n.Id == id);
-        if (note == null)
-        {
-            return NotFound();
-        }
-        return note;
+        if (note == null) return NotFound();
+        
+        return MapToDto(note);
     }
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateNote(int id, Note note)
+    public async Task<IActionResult> UpdateNote(int id, NoteRequestDto dto)
     {
-        if (id != note.Id)
-            return BadRequest();
-        _context.Entry(note).State = EntityState.Modified;
+        var note = await _context.Notes.FindAsync(id);
+        if(note == null) return NotFound();
+        note.WorkOrderId = dto.WorkOrderId;
+        note.Description = dto.Description;
         await _context.SaveChangesAsync();
         return NoContent();
-
     }
 
     [HttpDelete("{id}")]
@@ -66,7 +73,13 @@ public class NotesController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
-
+    private NoteResponseDto MapToDto(Note n) => new NoteResponseDto
+    {
+        Id = n.Id,
+        Description = n.Description,
+        CreatedAt = n.CreatedAt,
+        WorkOrderId = n.WorkOrderId
+    };
 }
 
 
