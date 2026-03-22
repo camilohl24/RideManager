@@ -46,8 +46,7 @@ public class MotorcyclesController : ControllerBase
             .Include(m => m.Owner)
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (motorcycle == null)
-            return NotFound();
+        if (motorcycle == null)  return NotFound();
 
         return new MotorcycleResponseDto
         { 
@@ -96,8 +95,7 @@ public class MotorcyclesController : ControllerBase
     public async Task<IActionResult> UpdateMotorcycle(int id, MotorcycleRequestDto dto)
     {
         var motorcycle = await _context.Motorcycles.FindAsync(id);
-        if (motorcycle == null)
-            return NotFound();
+        if (motorcycle == null) return NotFound();
         motorcycle.LicensePlate = dto.LicensePlate;
         motorcycle.Brand = dto.Brand;
         motorcycle.Model = dto.Model;
