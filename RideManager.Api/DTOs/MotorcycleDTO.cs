@@ -3,28 +3,22 @@
 namespace RideManager.Api.DTOs;
 
 public class MotorcycleResponseDto
-{ 
+{
+    public string Brand { get; set; } = null!;
     public int Id { get; set; }
     public string LicensePlate { get; set; } = null!;
-    public string Brand { get; set; } = null!;
-    public string Model { get; set; } = null!;
-    public string Reference { get; set; } = null!;
-    public string OwnerName { get; set; } = null!;
+    public int Model { get; set; }
     public int OwnerId { get; set; }
+    public string OwnerName { get; set; } = null!;
+    public string Reference { get; set; } = null!;
     public List<int>? WorkOrdersId { get; set; }
 }
 
 public class MotorcycleRequestDto
 {
-    [Required]
-    public string LicensePlate { get; set; } = null!;
-    [Required]
     public string Brand { get; set; } = null!;
-    [Required]
-    public string Model { get; set; } = null!;
-    [Required]
-    public string Reference { get; set; } = null!;
-    [Required]
+    public string LicensePlate { get; set; } = null!;
+    public int Model { get; set; }
     public int OwnerId { get; set; }
-
+    public string Reference { get; set; } = null!;
 }
