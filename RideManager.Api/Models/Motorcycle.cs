@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace RideManager.Api.Models;
 
+[Index(nameof(LicensePlate), IsUnique = true)]
 public class Motorcycle
 {
     [Required]
