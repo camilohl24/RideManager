@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RideManager.Api.Data;
@@ -14,8 +15,8 @@ namespace RideManager.Api.Controllers;
 [Route("api/[Controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly AppDbContext _context;
     private readonly IConfiguration _config;
+    private readonly AppDbContext _context;
 
     public AuthController(AppDbContext context, IConfiguration config)
     {
@@ -23,23 +24,6 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
-    [HttpPost("register")]
-
-    public async Task<IActionResult> Register(RegisterDto dto)
-    {
-        bool exists = await _context.Users.AnyAsync(u => u.UserName == dto.UserName);
-        if (exists) return BadRequest("El Usuario ya exite");
-
-        var user = new User
-        {
-            UserName = dto.UserName,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = UserRole.Admin 
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return Ok("Usuario registrado correctamente");
-    }
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
@@ -52,8 +36,24 @@ public class AuthController : ControllerBase
         string token = GenerateToken(user);
 
         return Ok(new TokenResponseDto(token));
+    }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterDto dto)
+    {
+        bool exists = await _context.Users.AnyAsync(u => u.UserName == dto.UserName);
+        if (exists) return BadRequest("El Usuario ya exite");
 
+        var user = new User
+        {
+            UserName = dto.UserName,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            Role = dto.Role
+        };
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return Ok("Usuario registrado correctamente");
     }
 
     private string GenerateToken(User user)

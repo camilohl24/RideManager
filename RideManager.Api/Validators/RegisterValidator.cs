@@ -15,5 +15,7 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Debe especificar una contraseña")
             .MinimumLength(8).WithMessage("La contraseña debe de contener mas de 8 caracteres");
+        RuleFor(x => x.Role)
+            .NotEmpty().WithMessage("Debe especificar el cargo del usuario nuevo");
     }
 }
