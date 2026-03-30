@@ -9,12 +9,13 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Owner> Owners { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<Mechanic> Mechanics { get; set; }
     public DbSet<Motorcycle> Motorcycles { get; set; }
     public DbSet<Note> Notes { get; set; }
-    public DbSet<WorkOrder> WorkOrders { get; set; } 
-    public DbSet<Mechanic> Mechanics { get; set; } 
+    public DbSet<Owner> Owners { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<WorkOrder> WorkOrders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
