@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RideManager.Api.Data;
 using RideManager.Api.DTOs;
 using RideManager.Api.Models;
+using RideManager.Api.Services;
 
 namespace RideManager.Api.Controllers;
 
@@ -12,34 +13,18 @@ namespace RideManager.Api.Controllers;
 [Route("api/[controller]")]
 public class WorkOrdersController : ControllerBase
 {
-
     private readonly AppDbContext _context;
-    public WorkOrdersController(AppDbContext context)
+    private readonly EntityValidator _entityValidator;
+
+    public WorkOrdersController(AppDbContext context, EntityValidator entityValidator)
     {
         _context = context;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<WorkOrderResponseDto>>> GetWorkOrders()
-    {
-        var workOrder = await GetWorkOrdersWhithIncludes().ToListAsync();
-        return workOrder.Select(MapToDto).ToList();
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<WorkOrderResponseDto>> GetWorkOrder(int id)
-    {
-        var workOrder = await GetWorkOrdersWhithIncludes().FirstOrDefaultAsync(w => w.Id == id);
-
-        if (workOrder == null)
-            return NotFound();
-        return MapToDto(workOrder);
+        _entityValidator = entityValidator;
     }
 
     [HttpPost]
     public async Task<ActionResult<WorkOrderResponseDto>> CreateWorkOrder(WorkOrderRequestDto dto)
     {
-
         var workOrder = new WorkOrder()
         {
             Description = dto.Description,
@@ -53,6 +38,33 @@ public class WorkOrdersController : ControllerBase
         await _context.SaveChangesAsync();
         await LoadWorKOrderRelation(workOrder);
         return MapToDto(workOrder);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteWorkOrder(int id)
+    {
+        var workOrder = await _context.WorkOrders.FindAsync(id);
+        if (workOrder == null) return NotFound();
+        _context.WorkOrders.Remove(workOrder);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<WorkOrderResponseDto>> GetWorkOrder(int id)
+    {
+        var workOrder = await GetWorkOrdersWhithIncludes().FirstOrDefaultAsync(w => w.Id == id);
+
+        if (workOrder == null)
+            return NotFound();
+        return MapToDto(workOrder);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<WorkOrderResponseDto>>> GetWorkOrders()
+    {
+        var workOrder = await GetWorkOrdersWhithIncludes().ToListAsync();
+        return workOrder.Select(MapToDto).ToList();
     }
 
     [HttpPut("{id}")]
@@ -72,15 +84,18 @@ public class WorkOrdersController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteWorkOrder(int id)
+    private IQueryable<WorkOrder> GetWorkOrdersWhithIncludes() =>
+        _context.WorkOrders
+        .Include(w => w.Notes)
+            .Include(w => w.Mechanic)
+            .Include(w => w.Motorcycle)
+             .ThenInclude(m => m.Owner);
+
+    private async Task LoadWorKOrderRelation(WorkOrder workOrder)
     {
-        var workOrder = await _context.WorkOrders.FindAsync(id);
-        if (workOrder == null)
-            return NotFound();
-        _context.WorkOrders.Remove(workOrder);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        await _context.Entry(workOrder).Reference(w => w.Motorcycle).LoadAsync();
+        await _context.Entry(workOrder).Reference(w => w.Mechanic).LoadAsync();
+        await _context.Entry(workOrder).Collection(w => w.Notes).LoadAsync();
     }
 
     private WorkOrderResponseDto MapToDto(WorkOrder w) => new WorkOrderResponseDto
@@ -96,23 +111,4 @@ public class WorkOrdersController : ControllerBase
         LicensePlate = w.Motorcycle.LicensePlate,
         FullNameMechanic = $"{w.Mechanic.FirstName} {w.Mechanic.LastName}"
     };
-
-    private IQueryable<WorkOrder> GetWorkOrdersWhithIncludes() =>
-        _context.WorkOrders
-        .Include(w => w.Notes)
-            .Include(w => w.Mechanic)
-            .Include(w => w.Motorcycle)
-             .ThenInclude(m => m.Owner);
-
-    private async Task LoadWorKOrderRelation(WorkOrder workOrder)
-    {
-        await _context.Entry(workOrder).Reference(w => w.Motorcycle).LoadAsync();
-        await _context.Entry(workOrder).Reference(w => w.Mechanic).LoadAsync();
-        await _context.Entry(workOrder).Collection(w => w.Notes).LoadAsync();
-    }
-
 }
-
-
-
-

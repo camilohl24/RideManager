@@ -38,7 +38,6 @@ public class AuthController : ControllerBase
         return Ok(new TokenResponseDto(token));
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {

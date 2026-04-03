@@ -1,13 +1,14 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.IdentityModel.Tokens.Experimental;
 using RideManager.Api.Data;
-using System.Text;
-using RideManager.Api.Validators;
 using RideManager.Api.Middleware;
+using RideManager.Api.Services;
+using RideManager.Api.Validators;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
@@ -20,6 +21,7 @@ builder.Services.AddControllers()
     });
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<WorkOrderRequestValidator>();
+builder.Services.AddScoped<EntityValidator>();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

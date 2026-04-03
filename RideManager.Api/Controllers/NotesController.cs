@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RideManager.Api.Data;
 using RideManager.Api.DTOs;
 using RideManager.Api.Models;
+using RideManager.Api.Services;
 
 namespace RideManager.Api.Controllers;
 
@@ -14,22 +15,19 @@ namespace RideManager.Api.Controllers;
 public class NotesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly EntityValidator _entityValidator;
 
-    public NotesController(AppDbContext context)
+    public NotesController(AppDbContext context, EntityValidator entityValidator)
     {
         _context = context;
+        _entityValidator = entityValidator;
     }
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<NoteResponseDto>>> GetNotes()
-    {
-        var note =  await _context.Notes
-            .Include(n => n.WorkOrder)
-            .ToListAsync();
-        return  note.Select(MapToDto).ToList();
-    }
+
     [HttpPost]
     public async Task<ActionResult<NoteResponseDto>> CreateNote(NoteRequestDto dto)
     {
+        if (!await _entityValidator.WorkOrderExists(dto.WorkOrderId))
+            return BadRequest("La orden de trabajo especificada no existe");
         var note = new Note()
         {
             Description = dto.Description,
@@ -38,31 +36,11 @@ public class NotesController : ControllerBase
 
         _context.Notes.Add(note);
         await _context.SaveChangesAsync();
-        await _context.Entry(note).Reference(n => n.WorkOrder).LoadAsync();
-        return MapToDto(note);
-    }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<NoteResponseDto>> GetNote(int id)
-    {
-        var note = await _context.Notes
+        var result = await _context.Notes
             .Include(n => n.WorkOrder)
-            .FirstOrDefaultAsync(n => n.Id == id);
-        if (note == null) return NotFound();
-        
-        return MapToDto(note);
-    }
-
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateNote(int id, NoteRequestDto dto)
-    {
-        var note = await _context.Notes.FindAsync(id);
-        if(note == null) return NotFound();
-        note.WorkOrderId = dto.WorkOrderId;
-        note.Description = dto.Description;
-        await _context.SaveChangesAsync();
-        return NoContent();
+            .FirstOrDefaultAsync(n => n.Id == note.Id);
+        return MapToDto(result!);
     }
 
     [HttpDelete("{id}")]
@@ -75,6 +53,42 @@ public class NotesController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<NoteResponseDto>> GetNote(int id)
+    {
+        var note = await _context.Notes
+            .Include(n => n.WorkOrder)
+            .FirstOrDefaultAsync(n => n.Id == id);
+        if (note == null) return NotFound();
+
+        return MapToDto(note);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<NoteResponseDto>>> GetNotes()
+    {
+        var note = await _context.Notes
+            .Include(n => n.WorkOrder)
+            .ToListAsync();
+        return note.Select(MapToDto).ToList();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateNote(int id, NoteRequestDto dto)
+    {
+        var note = await _context.Notes.FindAsync(id);
+        if (note == null) return NotFound();
+
+        if (!await _entityValidator.WorkOrderExists(dto.WorkOrderId))
+            return BadRequest("La orden de trabajo especificada no existe");
+
+        note.WorkOrderId = dto.WorkOrderId;
+        note.Description = dto.Description;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
     private NoteResponseDto MapToDto(Note n) => new NoteResponseDto
     {
         Id = n.Id,
@@ -83,7 +97,3 @@ public class NotesController : ControllerBase
         WorkOrderId = n.WorkOrderId
     };
 }
-
-
-
-
