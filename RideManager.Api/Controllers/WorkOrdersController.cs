@@ -25,6 +25,8 @@ public class WorkOrdersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<WorkOrderResponseDto>> CreateWorkOrder(WorkOrderRequestDto dto)
     {
+        var error = await ValidateWorkOrdersFKs(dto);
+        if (error != null) return BadRequest(error);
         var workOrder = new WorkOrder()
         {
             Description = dto.Description,
@@ -36,8 +38,9 @@ public class WorkOrdersController : ControllerBase
         };
         _context.WorkOrders.Add(workOrder);
         await _context.SaveChangesAsync();
-        await LoadWorKOrderRelation(workOrder);
-        return MapToDto(workOrder);
+
+        var result = await GetWorkOrdersWhithIncludes().FirstOrDefaultAsync(w => w.Id == workOrder.Id);
+        return MapToDto(result!);
     }
 
     [HttpDelete("{id}")]
@@ -70,6 +73,9 @@ public class WorkOrdersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateWorkOrder(int id, WorkOrderRequestDto dto)
     {
+        var error = await ValidateWorkOrdersFKs(dto);
+        if (error != null) return BadRequest(error);
+
         var workOrder = await _context.WorkOrders.FindAsync(id);
         if (workOrder == null) return NotFound();
         workOrder.Description = dto.Description;
@@ -91,13 +97,6 @@ public class WorkOrdersController : ControllerBase
             .Include(w => w.Motorcycle)
              .ThenInclude(m => m.Owner);
 
-    private async Task LoadWorKOrderRelation(WorkOrder workOrder)
-    {
-        await _context.Entry(workOrder).Reference(w => w.Motorcycle).LoadAsync();
-        await _context.Entry(workOrder).Reference(w => w.Mechanic).LoadAsync();
-        await _context.Entry(workOrder).Collection(w => w.Notes).LoadAsync();
-    }
-
     private WorkOrderResponseDto MapToDto(WorkOrder w) => new WorkOrderResponseDto
     {
         Id = w.Id,
@@ -108,7 +107,16 @@ public class WorkOrdersController : ControllerBase
         CompletedAt = w.CompletedAt,
         Cost = w.Cost,
         NotesId = w.Notes.Select(n => n.Id).ToList(),
-        LicensePlate = w.Motorcycle.LicensePlate,
-        FullNameMechanic = $"{w.Mechanic.FirstName} {w.Mechanic.LastName}"
+        LicensePlate = w.Motorcycle != null ? w.Motorcycle.LicensePlate : null!,
+        FullNameMechanic = w.Mechanic != null ? $"{w.Mechanic.FirstName} {w.Mechanic.LastName}" : null!
     };
+
+    private async Task<string?> ValidateWorkOrdersFKs(WorkOrderRequestDto dto)
+    {
+        if (!await _entityValidator.MechanicExists(dto.MechanicId))
+            return "El mecancico especificado no existe";
+        if (!await _entityValidator.MotorcycleExists(dto.MotorcycleId))
+            return "La moto especificada no existe";
+        return null;
+    }
 }
