@@ -3,9 +3,9 @@ using RideManager.Api.DTOs;
 
 namespace RideManager.Api.Validators;
 
-public class RegisterValidator : AbstractValidator<RegisterDto>
+public class RegisterRequestValidator : AbstractValidator<RegisterDto>
 {
-    public RegisterValidator()
+    public RegisterRequestValidator()
     {
         RuleFor(x => x.UserName)
             .NotEmpty().WithMessage("Debe especificar un usuario")

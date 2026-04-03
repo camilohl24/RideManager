@@ -11,7 +11,7 @@ public class WorkOrderRequestValidator : AbstractValidator<WorkOrderRequestDto>
             .NotEmpty().WithMessage("La descripcion es obligatoria.")
             .MaximumLength(500).WithMessage("La descripcion no puede superar 500 caracteres");
         RuleFor(x => x.Diagnosis)
-            .NotEmpty().WithMessage("El diagnositco es obligatoriao")
+            .NotEmpty().WithMessage("El diagnositco es obligatorio")
             .MaximumLength(500).WithMessage("El diagnostico no puede superar 500 caracteres");
         RuleFor(x => x.Cost)
             .GreaterThanOrEqualTo(0).WithMessage("El Valor del servicio no puede ser negativo");
