@@ -25,6 +25,8 @@ public class MotorcyclesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<MotorcycleResponseDto>> CreateMotorcycle(MotorcycleRequestDto dto)
     {
+        if (!await _entityValidator.OwnerExists(dto.OwnerId))
+            return BadRequest("El dueño de la moto especificado no existe");
         var motorcycle = new Motorcycle()
         {
             LicensePlate = dto.LicensePlate,
@@ -37,18 +39,11 @@ public class MotorcyclesController : ControllerBase
         _context.Motorcycles.Add(motorcycle);
         await _context.SaveChangesAsync();
 
-        await _context.Entry(motorcycle).Reference(m => m.Owner).LoadAsync();
-        return new MotorcycleResponseDto
-        {
-            Id = motorcycle.Id,
-            LicensePlate = motorcycle.LicensePlate,
-            Brand = motorcycle.Brand,
-            Model = motorcycle.Model,
-            Reference = motorcycle.Reference,
-            OwnerId = motorcycle.OwnerId,
-            OwnerName = $"{motorcycle.Owner.FirstName} {motorcycle.Owner.LastName}",
-            WorkOrdersId = motorcycle.WorkOrders.Select(w => w.Id).ToList()
-        };
+        var result = await _context.Motorcycles
+            .Include(m => m.Owner)
+            .Include(m => m.WorkOrders)
+            .FirstOrDefaultAsync(m => m.Id == motorcycle.Id);
+        return MapToDto(result!);
     }
 
     [HttpDelete("{id}")]
@@ -72,17 +67,7 @@ public class MotorcyclesController : ControllerBase
 
         if (motorcycle == null) return NotFound();
 
-        return new MotorcycleResponseDto
-        {
-            Id = motorcycle.Id,
-            LicensePlate = motorcycle.LicensePlate,
-            Brand = motorcycle.Brand,
-            Model = motorcycle.Model,
-            Reference = motorcycle.Reference,
-            OwnerId = motorcycle.OwnerId,
-            OwnerName = $"{motorcycle.Owner.FirstName} {motorcycle.Owner.LastName}",
-            WorkOrdersId = motorcycle.WorkOrders.Select(w => w.Id).ToList()
-        };
+        return MapToDto(motorcycle);
     }
 
     [HttpGet]
@@ -93,22 +78,15 @@ public class MotorcyclesController : ControllerBase
          .Include(m => m.Owner)
          .ToListAsync();
 
-        return motorcycle.Select(m => new MotorcycleResponseDto
-        {
-            Id = m.Id,
-            LicensePlate = m.LicensePlate,
-            Brand = m.Brand,
-            Model = m.Model,
-            Reference = m.Reference,
-            OwnerId = m.OwnerId,
-            OwnerName = $"{m.Owner.FirstName} {m.Owner.LastName}",
-            WorkOrdersId = m.WorkOrders.Select(w => w.Id).ToList()
-        }).ToList();
+        return motorcycle.Select(MapToDto).ToList();
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateMotorcycle(int id, MotorcycleRequestDto dto)
     {
+        if (!await _entityValidator.OwnerExists(dto.OwnerId))
+            return BadRequest("El dueño de la moto especificado no existe");
+
         var motorcycle = await _context.Motorcycles.FindAsync(id);
         if (motorcycle == null) return NotFound();
         motorcycle.LicensePlate = dto.LicensePlate;
@@ -120,4 +98,16 @@ public class MotorcyclesController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    private MotorcycleResponseDto MapToDto(Motorcycle m) => new MotorcycleResponseDto
+    {
+        Id = m.Id,
+        LicensePlate = m.LicensePlate,
+        Brand = m.Brand,
+        Model = m.Model,
+        Reference = m.Reference,
+        OwnerId = m.OwnerId,
+        OwnerName = $"{m.Owner.FirstName} {m.Owner.LastName}",
+        WorkOrdersId = m.WorkOrders.Select(w => w.Id).ToList()
+    };
 }
