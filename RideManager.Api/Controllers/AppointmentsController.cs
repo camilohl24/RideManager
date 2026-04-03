@@ -25,6 +25,9 @@ public class AppointmentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AppointmentResponseDto>> CreateAppointment(AppointmentRequestDto dto)
     {
+        var error = await ValidateAppointmentFks(dto);
+        if (error != null) return BadRequest(error);
+
         var lastTurn = await _context.Appointments
             .Where(a => a.MechanicId == dto.MechanicId)
             .Where(a => a.CreatedAt.Date == DateTime.Today)
@@ -46,8 +49,13 @@ public class AppointmentsController : ControllerBase
         };
         _context.Appointments.Add(appointmet);
         await _context.SaveChangesAsync();
-        await LoadAppointmentRealation(appointmet);
-        return MapToDto(appointmet);
+
+        var result = await _context.Appointments
+            .Include(a => a.Mechanic)
+            .Include(a => a.Owner)
+            .Include(a => a.Motorcycle)
+            .FirstOrDefaultAsync(a => a.Id == appointmet.Id);
+        return MapToDto(result!);
     }
 
     [HttpDelete("{id}")]
@@ -79,8 +87,12 @@ public class AppointmentsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAppointment(int id, AppointmentRequestDto dto)
     {
+        var error = await ValidateAppointmentFks(dto);
+        if (error != null) return BadRequest(error);
+
         var appointment = await _context.Appointments.FindAsync(id);
         if (appointment == null) return NotFound();
+
         appointment.ContactName = dto.ContactName;
         appointment.ContactPhone = dto.ContactPhone;
         appointment.MechanicId = dto.MechanicId;
@@ -99,13 +111,6 @@ public class AppointmentsController : ControllerBase
         .Include(a => a.Owner)
         .Include(a => a.Motorcycle);
 
-    private async Task LoadAppointmentRealation(Appointment appointment)
-    {
-        await _context.Entry(appointment).Reference(a => a.Mechanic).LoadAsync();
-        await _context.Entry(appointment).Reference(a => a.Owner).LoadAsync();
-        await _context.Entry(appointment).Reference(a => a.Motorcycle).LoadAsync();
-    }
-
     private AppointmentResponseDto MapToDto(Appointment a) => new AppointmentResponseDto
     {
         Id = a.Id,
@@ -120,4 +125,15 @@ public class AppointmentsController : ControllerBase
         Status = a.Status,
         TurnNumber = a.TurnNumber
     };
+
+    private async Task<string?> ValidateAppointmentFks(AppointmentRequestDto dto)
+    {
+        if (!await _entityValidator.MechanicExists(dto.MechanicId))
+            return "El mecanico especificado no existe";
+        if (dto.OwnerId.HasValue && !await _entityValidator.OwnerExists(dto.OwnerId))
+            return "El dueño de la moto especificado no existe";
+        if (dto.MotorcycleId.HasValue && !await _entityValidator.MotorcycleExists(dto.MotorcycleId))
+            return "La moto especificada no existe";
+        return null;
+    }
 }

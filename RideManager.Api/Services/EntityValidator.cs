@@ -12,13 +12,13 @@ public class EntityValidator
         _context = context;
     }
 
-    public async Task<bool> MechanicExists(int id) =>
+    public async Task<bool> MechanicExists(int? id) =>
         await _context.Mechanics.AnyAsync(m => m.Id == id);
 
-    public async Task<bool> MotorcycleExists(int id) =>
+    public async Task<bool> MotorcycleExists(int? id) =>
         await _context.Motorcycles.AnyAsync(m => m.Id == id);
 
-    public async Task<bool> OwnerExists(int id) =>
+    public async Task<bool> OwnerExists(int? id) =>
             await _context.Owners.AnyAsync(o => o.Id == id);
 
     public async Task<bool> WorkOrderExists(int id) =>
