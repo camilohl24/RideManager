@@ -17,11 +17,16 @@ export default function LoginPage() {
         try {
             setError('');
             const response = await login({ userName, password });
-            const user = jwtDecode<{ id: number, unique_name: string, role: string }>(response.token);
+            const user = jwtDecode<{ 
+                sub: number,
+                unique_name: string,
+                'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string 
+            }>(response.token);
+            
             setAuth(response.token, {
-                id: user.id,
+                id: Number(user.sub),
                 userName: user.unique_name,
-                role: user.role
+                role: user['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
             });
             navigate("/dashboard")
         } catch {
