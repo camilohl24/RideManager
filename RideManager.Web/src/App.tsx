@@ -1,5 +1,18 @@
-import LoginPage from "./pages/auth/LoginPage"
-function App(){
-  return<LoginPage/>
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import LoginPage from './pages/auth/LoginPage'
+import DashboardPage from './pages/dashboard/DashboardPage'
+import { useAuthStore } from './store/authStore'
+function App() {
+  const token = useAuthStore((state) => state.token)
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path='/dashboard?' element={token? <DashboardPage/> : <Navigate to= "/login"/>} />
+        <Route path='*' element={<Navigate to={token?  "/dashboard" : "/login"}/> } />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 export default App
