@@ -9,8 +9,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path='/dashboard?' element={token? <DashboardPage/> : <Navigate to= "/login"/>} />
-        <Route path='*' element={<Navigate to={token?  "/dashboard" : "/login"}/> } />
+        <Route path="/dashboard" element={token? <DashboardPage/> : <Navigate to= "/login"/>} />
+        <Route path="*" element={<Navigate to={token?  "/dashboard" : "/login"}/> } />
       </Routes>
     </BrowserRouter>
   )

@@ -1,6 +1,6 @@
 export default function DashboardPage() {
     return (
-        <div className="text-white">
+        <div className="text-black">
             <h1>Dashboard</h1>
         </div>
     )

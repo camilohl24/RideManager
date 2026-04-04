@@ -23,7 +23,7 @@ export default function LoginPage() {
                 userName: user.unique_name,
                 role: user.role
             });
-            navigate('/dashboard')
+            navigate("/dashboard")
         } catch {
             setError('Usuario o contraseña incorrectos')
         }
