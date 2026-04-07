@@ -1,0 +1,70 @@
+import type { WorkOrderStatus, AppointmentStatus,AppointmentType } from "./enums";
+
+export interface WorkOrderResponse {
+completedAt: string | null
+cost: number
+createdAt: string
+description: string
+diagnosis: string
+fullNameMechanic: string
+id: number
+licensePlate: string
+notesId: number[]
+status: WorkOrderStatus
+
+}
+
+export interface MechanicResponse {
+    documentId: string
+    email: string
+    fullName:  string
+    id: number
+    phone: string
+    position: string
+}
+
+export interface MotorcycleResponse {
+    brand : string
+    id: number
+    licensePlate: string
+    model: number
+    ownerId: number
+    ownerName: string
+    reference: string
+    workOrdersId: number[] | null
+}
+
+export interface OwnerResponse {
+    documentId: string
+    email: string
+    fullName: string
+    id: number
+    licensePlates:string[] | null
+    phone: string
+}
+
+export interface AppointmentResponse {
+    contactName: string | null
+    contactPhone: string | null
+    createdAt: string
+    fullNameMechanic: string | null
+    fullNameOwner: string | null
+    id: number
+    licensePlate: string | null
+    reason: string
+    scheduledAt: string | null
+    status: AppointmentStatus
+    turnNumber: number
+    type: AppointmentType
+}
+
+export interface NotesResponse {
+    createdAt: string
+    description: string
+    id: number
+    workOrderId: number
+}
+
+export interface TokenResponse {
+    token: string
+}
