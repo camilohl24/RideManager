@@ -21,6 +21,7 @@ export interface MechanicResponse {
     id: number
     phone: string
     position: string
+    createdAt: string
 }
 
 export interface MotorcycleResponse {
@@ -32,6 +33,7 @@ export interface MotorcycleResponse {
     ownerName: string
     reference: string
     workOrdersId: number[] | null
+    createdAt: string
 }
 
 export interface OwnerResponse {
@@ -41,6 +43,7 @@ export interface OwnerResponse {
     id: number
     licensePlates:string[] | null
     phone: string
+    createdAt: string
 }
 
 export interface AppointmentResponse {

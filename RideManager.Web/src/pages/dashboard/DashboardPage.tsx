@@ -36,10 +36,18 @@ export default function DashboardPage() {
 
 
     }, [])
-    const activeOrders = workOrders.filter(o => 
+    const activeOrders = workOrders.filter(o =>
         o.status !== WorkOrderStatus.Done &&
         o.status !== WorkOrderStatus.ReadyForDelivery
     ).length
+    const today = new Date().toDateString()
+    const completedToday = workOrders.filter(o => 
+        
+        o.status == WorkOrderStatus.Done &&
+        new Date(o.completedAt!).toDateString() === today
+    ).length
+
+    
 
 }
 
