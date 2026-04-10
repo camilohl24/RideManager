@@ -12,6 +12,7 @@ public class MotorcycleResponseDto
     public string OwnerName { get; set; } = null!;
     public string Reference { get; set; } = null!;
     public List<int>? WorkOrdersId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class MotorcycleRequestDto

@@ -25,4 +25,5 @@ public class Mechanic
 
     [Required]
     public string Position { get; set; } = null!;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

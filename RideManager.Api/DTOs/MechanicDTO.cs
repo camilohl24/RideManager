@@ -22,5 +22,6 @@ namespace RideManager.Api.DTOs
         public int Id { get; set; }
         public string Phone { get; set; } = null!;
         public string Position { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -10,6 +10,7 @@ public class OwnerResponseDto
     public int Id { get; set; }
     public List<string>? LicensePlates { get; set; }
     public string Phone { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
 }
 
 public class OwnerRequestDto

@@ -6,7 +6,7 @@ namespace RideManager.Api.Models
     {
         public string? ContactName { get; set; }
         public string? ContactPhone { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int Id { get; set; }
         public Mechanic? Mechanic { get; set; }
         public int? MechanicId { get; set; }

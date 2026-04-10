@@ -22,17 +22,10 @@ public class MechanicsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MechanicResponseDto>>> GetMechanics()
     {
-       var mechanics = await _context.Mechanics.ToListAsync();
-        return mechanics.Select(m => new MechanicResponseDto
-        {
-            Id = m.Id,
-            DocumentId = m.DocumentId,
-            FullName = $"{m.FirstName} {m.LastName}",
-            Phone = m.Phone,
-            Email = m.Email,
-            Position = m.Position
-        }).ToList();
+        var mechanics = await _context.Mechanics.ToListAsync();
+        return mechanics.Select(MapToDto).ToList();
     }
+
     [HttpPost]
     public async Task<ActionResult<MechanicResponseDto>> CreateMechanic(MechanicRequestDto dto)
     {
@@ -49,15 +42,7 @@ public class MechanicsController : ControllerBase
         _context.Mechanics.Add(mechanic);
         await _context.SaveChangesAsync();
 
-        return new MechanicResponseDto
-        {
-            Id = mechanic.Id,
-            DocumentId =mechanic.DocumentId,
-            FullName = $"{mechanic.FirstName} {mechanic.LastName}",
-            Phone = mechanic.Phone,
-            Email = mechanic.Email,
-            Position = mechanic.Position
-        };
+        return MapToDto(mechanic);
     }
 
     [HttpGet("{id}")]
@@ -66,15 +51,7 @@ public class MechanicsController : ControllerBase
         var mechanic = await _context.Mechanics.FindAsync(id);
         if (mechanic == null)
             return NotFound();
-        return  new MechanicResponseDto
-        {
-            Id = mechanic.Id,
-            DocumentId=mechanic.DocumentId,
-            FullName = $"{mechanic.FirstName} {mechanic.LastName}",
-            Phone = mechanic.Phone,
-            Email = mechanic.Email,
-            Position = mechanic.Position
-        };
+        return MapToDto(mechanic);
     }
 
 
@@ -106,4 +83,17 @@ public class MechanicsController : ControllerBase
         return NoContent();
     }
 
-}
+    private MechanicResponseDto MapToDto(Mechanic m) => new MechanicResponseDto
+    {
+        Id = m.Id,
+        DocumentId = m.DocumentId,
+        FullName = $"{m.FirstName} {m.LastName}",
+        Phone = m.Phone,
+        Email = m.Email,
+        Position = m.Position,
+        CreatedAt = m.CreatedAt
+    };
+
+};
+
+

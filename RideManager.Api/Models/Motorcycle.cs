@@ -25,4 +25,5 @@ public class Motorcycle
     public string Reference { get; set; } = null!;
 
     public List<WorkOrder> WorkOrders { get; set; } = new();
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

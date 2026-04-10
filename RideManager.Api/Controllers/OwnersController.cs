@@ -26,15 +26,7 @@ public class OwnersController : ControllerBase
         .Include(o => o.Motorcycles)
         .ToListAsync();
 
-        return owners.Select(o => new OwnerResponseDto
-        {
-            Id = o.Id,
-            DocumentId = o.DocumentId,
-            FullName = $"{o.FirstName} {o.LastName}",
-            Phone = o.Phone,
-            Email = o.Email,
-            LicensePlates = o.Motorcycles.Select(m => m.LicensePlate).ToList()
-        }).ToList();
+        return owners.Select(MapToDto).ToList();
 
     }
     [HttpPost]
@@ -51,15 +43,11 @@ public class OwnersController : ControllerBase
         };
         _context.Owners.Add(owner);
         await _context.SaveChangesAsync();
-        return new OwnerResponseDto
-        {
-            Id = owner.Id,
-            DocumentId= owner.DocumentId,
-            FullName = $"{owner.FirstName} {owner.LastName}",
-            Phone = owner.Phone,
-            Email = owner.Email,
-            LicensePlates = owner.Motorcycles.Select(m => m.LicensePlate).ToList()
-        };
+
+        var result = await _context.Owners
+            .Include(O => O.Motorcycles)
+            .FirstOrDefaultAsync(o => o.Id == owner.Id);
+      return  MapToDto(result!);
     }
 
     [HttpGet("{id}")]
@@ -70,14 +58,7 @@ public class OwnersController : ControllerBase
             .FirstOrDefaultAsync(o => o.Id == id);
         if (owner == null)
             return NotFound();
-        return new OwnerResponseDto 
-        {   Id = owner.Id, 
-            DocumentId = owner.DocumentId,
-            FullName = $"{owner.FirstName} {owner.LastName}", 
-            Phone = owner.Phone, 
-            Email = owner.Email,
-            LicensePlates = owner.Motorcycles.Select(m => m.LicensePlate).ToList()
-        };
+        return MapToDto(owner);
     }
 
 
@@ -106,4 +87,15 @@ public class OwnersController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    private OwnerResponseDto MapToDto(Owner o) => new OwnerResponseDto
+    {
+        Id = o.Id,
+        DocumentId = o.DocumentId,
+        FullName = $"{o.FirstName} {o.LastName}",
+        Phone = o.Phone,
+        Email = o.Email,
+        LicensePlates = o.Motorcycles.Select(m => m.LicensePlate).ToList(),
+        CreatedAt = o.CreatedAt
+    };
 }

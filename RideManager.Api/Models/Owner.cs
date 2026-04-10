@@ -24,4 +24,5 @@ public class Owner
 
     [Required]
     public string Phone { get; set; } = null!;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

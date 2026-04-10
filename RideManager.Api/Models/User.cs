@@ -6,4 +6,5 @@ public class User
     public string UserName { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public UserRole Role {  get; set; } = UserRole.Mechanic;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

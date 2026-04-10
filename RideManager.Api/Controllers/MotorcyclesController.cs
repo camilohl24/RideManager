@@ -108,6 +108,7 @@ public class MotorcyclesController : ControllerBase
         Reference = m.Reference,
         OwnerId = m.OwnerId,
         OwnerName = m.Owner != null ? $"{m.Owner.FirstName} {m.Owner.LastName}" : null!,
-        WorkOrdersId = m.WorkOrders.Select(w => w.Id).ToList()
+        WorkOrdersId = m.WorkOrders.Select(w => w.Id).ToList(),
+        CreatedAt = m.CreatedAt
     };
 }
