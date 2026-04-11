@@ -1,23 +1,26 @@
-import type { WorkOrderStatus, AppointmentStatus,AppointmentType } from "./enums";
+import type {
+    WorkOrderStatus,
+    AppointmentStatus,
+    AppointmentType,
+} from './enums'
 
 export interface WorkOrderResponse {
-completedAt: string | null
-cost: number
-createdAt: string
-description: string
-diagnosis: string
-fullNameMechanic: string
-id: number
-licensePlate: string
-notesId: number[]
-status: WorkOrderStatus
-
+    completedAt: string | null
+    cost: number
+    createdAt: string
+    description: string
+    diagnosis: string
+    fullNameMechanic: string
+    id: number
+    licensePlate: string
+    notesId: number[]
+    status: WorkOrderStatus
 }
 
 export interface MechanicResponse {
     documentId: string
     email: string
-    fullName:  string
+    fullName: string
     id: number
     phone: string
     position: string
@@ -25,7 +28,7 @@ export interface MechanicResponse {
 }
 
 export interface MotorcycleResponse {
-    brand : string
+    brand: string
     id: number
     licensePlate: string
     model: number
@@ -41,7 +44,7 @@ export interface OwnerResponse {
     email: string
     fullName: string
     id: number
-    licensePlates:string[] | null
+    licensePlates: string[] | null
     phone: string
     createdAt: string
 }

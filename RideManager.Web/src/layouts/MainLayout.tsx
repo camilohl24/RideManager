@@ -1,17 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
-import Header  from './Header';
+import Header from './Header'
 
 export default function MainLayout() {
-    return (
-        <div className='flex h-scream bg[#0d0f14] overflow-hidden'>
-            <Sidebar />
-            <div className='flex flex-col flex-1 min-w-0'>
-                <Header />
-                <main className='flex-1 overflow-y-auto p-4 bg-[#0d0f14]'>
-                    <Outlet />
-                </main>
-            </div>
-        </div>
-    )
+  return (
+    <div className="bg[#0d0f14] flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Header />
+        <main className="flex-1 overflow-y-auto bg-[#0d0f14] p-4">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  )
 }

@@ -10,10 +10,13 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route element={token ? <MainLayout/> : <Navigate to="/login"/>}>
+        <Route element={token ? <MainLayout /> : <Navigate to="/login" />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
-        <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} />} />
+        <Route
+          path="*"
+          element={<Navigate to={token ? '/dashboard' : '/login'} />}
+        />
       </Routes>
     </BrowserRouter>
   )
