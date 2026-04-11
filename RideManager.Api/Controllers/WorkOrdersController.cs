@@ -108,7 +108,8 @@ public class WorkOrdersController : ControllerBase
         Cost = w.Cost,
         NotesId = w.Notes.Select(n => n.Id).ToList(),
         LicensePlate = w.Motorcycle != null ? w.Motorcycle.LicensePlate : null!,
-        FullNameMechanic = w.Mechanic != null ? $"{w.Mechanic.FirstName} {w.Mechanic.LastName}" : null!
+        FullNameMechanic = w.Mechanic != null ? $"{w.Mechanic.FirstName} {w.Mechanic.LastName}" : null!,
+        OwnerName = w.Motorcycle?.Owner !=null ? $"{w.Motorcycle.Owner.FirstName} {w.Motorcycle.Owner.LastName}" : null!
     };
 
     private async Task<string?> ValidateWorkOrdersFKs(WorkOrderRequestDto dto)

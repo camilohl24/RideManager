@@ -16,6 +16,7 @@ public class WorkOrderResponseDto
     public string LicensePlate { get; set; } = null!;
     public List<int> NotesId { get; set; } = new();
     public WorkOrderStatus Status { get; set; } = WorkOrderStatus.Pending;
+    public string OwnerName { get; set; } = null!;
 }
 
 public class WorkOrderRequestDto
