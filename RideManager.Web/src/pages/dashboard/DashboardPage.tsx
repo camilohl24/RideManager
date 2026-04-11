@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import KpiCard from '@/components/dashboard/KpiCard'
 
 const STATUS_STYLE: Record<string, string> = {
   Pending: 'bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/15',
@@ -31,7 +32,7 @@ const STATUS_STYLE: Record<string, string> = {
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  Pendind: 'Pendiente',
+  Pending: 'Pendiente',
   InRepair: 'En reparacion',
   Done: 'Finalizado',
   ReadyForDelivery: 'Listo para entrega',
@@ -122,50 +123,34 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
-        <Card className="flex flex-row items-center gap-4 border-[#2a2d3a] bg-[#181b26] p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-sm">
-            🕐
-          </div>
-          <div className="flex-1">
-            <p className="mb-1 text-xs text-gray-500">órdenes activas</p>
-            <p className="text-2xl font-semibold text-white">{activeOrders}</p>
-          </div>
-          <span className="text-lg text-green-400">↗</span>
-        </Card>
-        <Card className="flex flex-row items-center gap-4 border-[#2a2d3a] bg-[#181b26] p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-sm">
-            ✅
-          </div>
-          <div className="flex-1">
-            <p className="mb-1 text-xs text-gray-500">Completadas hoy</p>
-            <p className="text-2xl font-semibold text-white">
-              {completedToday}
-            </p>
-          </div>
-          <span className="text-lg text-green-400">↗</span>
-        </Card>
-        <Card className="flex flex-row items-center gap-4 border-[#2a2d3a] bg-[#181b26] p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-sm">
-            👤
-          </div>
-          <div className="flex-1">
-            <p className="mb-1 text-xs text-gray-500">Clientes nuevos</p>
-            <p className="text-2xl font-semibold text-white">{newClients}</p>
-          </div>
-          <span className="text-lg text-green-400">↗</span>
-        </Card>
-        <Card className="flex flex-row items-center gap-4 border-[#2a2d3a] bg-[#181b26] p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-sm">
-            📅
-          </div>
-          <div className="flex-1">
-            <p className="mb-1 text-xs text-gray-500">Citas mañana</p>
-            <p className="text-2xl font-semibold text-white">
-              {tomorrowAppointments}
-            </p>
-          </div>
-          <span className="text-lg text-red-400">↘</span>
-        </Card>
+        <KpiCard
+          icon="🕐"
+          label="Órdenes activas"
+          value={activeOrders}
+          trend="up"
+          color="blue"
+        />
+        <KpiCard
+          icon="✅"
+          label="Completadas hoy"
+          value={completedToday}
+          trend="up"
+          color="green"
+        />
+        <KpiCard
+          icon="👤"
+          label="Clientes nuevos"
+          value={newClients}
+          trend="up"
+          color="teal"
+        />
+        <KpiCard
+          icon="📅"
+          label="Citas mañana"
+          value={tomorrowAppointments}
+          trend="down"
+          color="red"
+        />
       </div>
       <div className="grid grid-cols-4 gap-3">
         <Card className="border-[#2a2d3a] bg-[#181b26] p-4">
