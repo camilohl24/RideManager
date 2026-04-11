@@ -13,6 +13,29 @@ import {
 } from '@/types/api'
 import { WorkOrderStatus } from '@/types/enums'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+const STATUS_STYLE: Record<string, string> = {
+  Pending: 'bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/15',
+  InRepair: 'bg-purple-500/15 text-purple-400 hover:bg-purple-500/15',
+  Done: 'bg-green-500/15 text-green-400 hover:bg-green-500/15',
+  ReadyForDelivery: 'bg-blue-500/15 text-blue-400 hover:bg-blue-500/15',
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  Pendind: 'Pendiente',
+  InRepair: 'En reparacion',
+  Done: 'Finalizado',
+  ReadyForDelivery: 'Listo para entrega',
+}
 
 export default function DashboardPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrderResponse[]>([])
@@ -182,6 +205,49 @@ export default function DashboardPage() {
           <p className="mt-1 text-xs text-gray-500">Mecanicos disponibles</p>
         </Card>
       </div>
+      <Card className="border-[#2a2d3a] bg-[#181b26] p-4">
+        <p className="mb-3 text-xs font-medium tracking-wider text-gray-400 uppercase">
+          Ultimas ordenes y estado
+        </p>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-gray-400">Nro.</TableHead>
+              <TableHead className="text-gray-400">Fecha</TableHead>
+              <TableHead className="text-gray-400">Moto</TableHead>
+              <TableHead className="text-gray-400">Mecanico</TableHead>
+              <TableHead className="text-gray-400">Estado</TableHead>
+              <TableHead className="text-gray-400">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {workOrders.slice(0, 5).map((order) => (
+              <TableRow key={order.id} className="border-[#2a2d3a]">
+                <TableCell className="text-gray-300">{order.id}</TableCell>
+                <TableCell className="text-gray-300">
+                  {new Date(order.createdAt).toLocaleDateString('es-CO')}
+                </TableCell>
+                <TableCell className="text-gray-300">
+                  {order.licensePlate}
+                </TableCell>
+                <TableCell className="text-gray-300">
+                  {order.fullNameMechanic}
+                </TableCell>
+                <TableCell>
+                  <Badge className={STATUS_STYLE[order.status]}>
+                    {STATUS_LABELS[order.status]}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-gray-300">
+                  <button className="text-xs text-orange-500 hover:text-orange-400">
+                    Ver
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }
