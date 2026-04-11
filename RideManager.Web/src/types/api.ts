@@ -15,6 +15,7 @@ export interface WorkOrderResponse {
     licensePlate: string
     notesId: number[]
     status: WorkOrderStatus
+    ownerName: string | null
 }
 
 export interface MechanicResponse {

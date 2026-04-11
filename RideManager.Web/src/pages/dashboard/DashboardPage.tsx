@@ -215,6 +215,7 @@ export default function DashboardPage() {
               <TableHead className="text-gray-400">Nro.</TableHead>
               <TableHead className="text-gray-400">Fecha</TableHead>
               <TableHead className="text-gray-400">Moto</TableHead>
+              <TableHead className="text-gray-400">Cliente</TableHead>
               <TableHead className="text-gray-400">Mecanico</TableHead>
               <TableHead className="text-gray-400">Estado</TableHead>
               <TableHead className="text-gray-400">Acciones</TableHead>
@@ -229,6 +230,9 @@ export default function DashboardPage() {
                 </TableCell>
                 <TableCell className="text-gray-300">
                   {order.licensePlate}
+                </TableCell>
+                <TableCell className="text-gray-300">
+                  {order.ownerName ?? '-'}
                 </TableCell>
                 <TableCell className="text-gray-300">
                   {order.fullNameMechanic}
