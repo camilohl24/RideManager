@@ -95,7 +95,13 @@ public class OwnersController : ControllerBase
         FullName = $"{o.FirstName} {o.LastName}",
         Phone = o.Phone,
         Email = o.Email,
-        LicensePlates = o.Motorcycles.Select(m => m.LicensePlate).ToList(),
-        CreatedAt = o.CreatedAt
+        CreatedAt = o.CreatedAt,
+        Motorcycles = o.Motorcycles.Select(m => new OwnerMotorcycleDTO
+        {
+            LicensePlate = m.LicensePlate,
+            Brand = m.Brand,
+            Model = m.Model,
+            Reference = m.Reference,
+        }).ToList()
     };
 }

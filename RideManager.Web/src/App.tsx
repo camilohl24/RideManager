@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/auth/LoginPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
+import OwnersPage from './pages/owners/OwnersPage'
 import MainLayout from './layouts/MainLayout'
 import { useAuthStore } from './store/authStore'
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route element={token ? <MainLayout /> : <Navigate to="/login" />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/owners" element={<OwnersPage />} />
         </Route>
         <Route
           path="*"

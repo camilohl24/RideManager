@@ -48,6 +48,9 @@ export interface OwnerResponse {
     licensePlates: string[] | null
     phone: string
     createdAt: string
+    brand: string[] | null
+    model: number[] | null
+    reference: string[] | null
 }
 
 export interface AppointmentResponse {
