@@ -40,17 +40,20 @@ export interface MotorcycleResponse {
     createdAt: string
 }
 
+export interface OwnerMotorcycleResponse {
+    licensePlate: string
+    model: number
+    reference: string
+    brand: string
+}
 export interface OwnerResponse {
     documentId: string
     email: string
     fullName: string
     id: number
-    licensePlates: string[] | null
     phone: string
     createdAt: string
-    brand: string[] | null
-    model: number[] | null
-    reference: string[] | null
+    motorcycles: OwnerMotorcycleResponse[] | null
 }
 
 export interface AppointmentResponse {

@@ -11,6 +11,7 @@ public class OwnerResponseDto
     public string Phone { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public List<OwnerMotorcycleDTO>? Motorcycles { get; set; }
+}
    
 
 public class OwnerRequestDto
