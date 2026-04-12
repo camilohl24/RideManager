@@ -116,7 +116,7 @@ export default function OwnersPage() {
                     </TableCell>
                     <TableCell className="text-gray-300">
                       <Badge className="bg-green-500/15 text-green-400 hover:bg-green-500/15">
-                        {owner.licensePlates?.length ?? 0} motos
+                        {owner.motorcycles?.length ?? 0} motos
                       </Badge>
                     </TableCell>
                     <TableCell className="text-gray-300">
@@ -192,7 +192,7 @@ export default function OwnersPage() {
                     Total motos
                   </p>
                   <p className="text-xs text-gray-300">
-                    {selectedOwner.licensePlates?.length ?? 0}
+                    {selectedOwner.motorcycles?.length ?? 0}
                   </p>
                 </div>
               </div>
@@ -201,17 +201,16 @@ export default function OwnersPage() {
                 Motocicletas
               </p>
               <div className="flex flex-col gap-2">
-                {selectedOwner.licensePlates?.map((plate) => (
+                {selectedOwner.motorcycles?.map((moto) => (
                   <div
-                    key={plate}
+                    key={moto.licensePlate}
                     className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2"
                   >
                     <p className="text-xs font-medium text-orange-400">
-                      {plate}
+                      {moto.licensePlate}
                     </p>
-                    <p className="mt-0.5 text-[10px] text-gray-500 lowercase">
-                      {selectedOwner.brand} {selectedOwner.reference} ·
-                      {selectedOwner.model}
+                    <p className="text-[10px] text-gray-500">
+                      {moto.brand} {moto.reference} · {moto.model}
                     </p>
                   </div>
                 ))}
