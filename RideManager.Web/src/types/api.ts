@@ -81,3 +81,11 @@ export interface NotesResponse {
 export interface TokenResponse {
     token: string
 }
+
+export interface OwnerRequest {
+    documentId: string
+    email: string
+    firstName: string
+    lastName: string
+    phone: string
+}

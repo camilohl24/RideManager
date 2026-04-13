@@ -32,17 +32,29 @@ public class OwnersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OwnerResponseDto>> CreateOwner(OwnerRequestDto dto)
     {
-
-        var owner = new Owner
+        try
         {
-            DocumentId = dto.DocumentId,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Phone = dto.Phone,
-            Email = dto.Email
-        };
-        _context.Owners.Add(owner);
-        await _context.SaveChangesAsync();
+            var owner = new Owner
+            {
+                DocumentId = dto.DocumentId,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Phone = dto.Phone,
+                Email = dto.Email
+            };
+            _context.Owners.Add(owner);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            if(ex.InnerException?.Message.Contains("DocumentId") == true)
+            {
+                return BadRequest("Ya existe cliente con ese numero de documento");
+            }
+            return BadRequest("Error al crear el cliente intenta de nuevo");
+        }
+
+      
 
         var result = await _context.Owners
             .Include(O => O.Motorcycles)

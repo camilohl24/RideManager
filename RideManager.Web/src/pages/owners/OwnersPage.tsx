@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getOwners } from '@/services/ownerService'
+import { createOwner, getOwners, updateOwner } from '@/services/ownerService'
 import { type OwnerResponse } from '@/types/api'
 import { Card } from '@/components/ui/card'
 import {
@@ -19,6 +19,14 @@ export default function OwnersPage() {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedOwner, setSelectedOwner] = useState<OwnerResponse | null>(null)
   const [editOwner, setEditOwner] = useState<OwnerResponse | null>(null)
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    documentId: '',
+    phone: '',
+    email: '',
+  })
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -42,6 +50,22 @@ export default function OwnersPage() {
     )
   }
 
+  async function handleSubmit() {
+    try {
+      if (editOwner) {
+        await updateOwner(editOwner.id, form)
+      } else {
+        await createOwner(form)
+      }
+      const update = await getOwners()
+      setOwners(update)
+      setShowModal(false)
+      setEditOwner(null)
+    } catch (error: any) {
+      setError(error.Response?.data ?? 'Error al guardar')
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -60,7 +84,17 @@ export default function OwnersPage() {
             />
           </div>
           <Button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditOwner(null)
+              setForm({
+                firstName: '',
+                lastName: '',
+                documentId: '',
+                phone: '',
+                email: '',
+              })
+              setShowModal(true)
+            }}
             className="bg-orange-500 font-semibold text-white hover:bg-orange-600"
           >
             + Nuevo cliente
@@ -73,7 +107,7 @@ export default function OwnersPage() {
           <Card className="border-[#2a2d3a] bg-[#181b26]">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-white/5">
                   <TableHead className="text-gray-400 uppercase">
                     cliente
                   </TableHead>
@@ -96,7 +130,10 @@ export default function OwnersPage() {
               </TableHeader>
               <TableBody>
                 {owners.map((owner) => (
-                  <TableRow key={owner.id} className="border-[#2a2d3a]">
+                  <TableRow
+                    key={owner.id}
+                    className="border-[#2a2d3a] hover:bg-white/5"
+                  >
                     <TableCell className="text-gray-300">
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-[10px] font-bold text-orange-400 uppercase">
@@ -130,6 +167,16 @@ export default function OwnersPage() {
                         <button
                           onClick={() => {
                             setEditOwner(owner)
+                            setForm({
+                              firstName: owner.fullName.split(' ')[0],
+                              lastName: owner.fullName
+                                .split(' ')
+                                .slice(1)
+                                .join(' '),
+                              documentId: owner.documentId,
+                              phone: owner.phone,
+                              email: owner.email,
+                            })
                             setShowModal(true)
                           }}
                           className="text-xs text-blue-500 hover:text-blue-400"
@@ -219,6 +266,100 @@ export default function OwnersPage() {
           </div>
         )}
       </div>
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-130 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-4 text-sm font-semibold text-white">
+              {editOwner ? 'Editar cliente' : 'Nuevo cliente'}
+            </h2>
+            <div className="flex flex-col gap-1">
+              <div className="mb-3 grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Nombre
+                  </label>
+                  <input
+                    value={form.firstName}
+                    onChange={(e) =>
+                      setForm({ ...form, firstName: e.target.value })
+                    }
+                    placeholder="Nombre"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Apellido
+                  </label>
+                  <input
+                    value={form.lastName}
+                    onChange={(e) =>
+                      setForm({ ...form, lastName: e.target.value })
+                    }
+                    placeholder="Apellido"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+              </div>
+              <label className="text-[10px] text-gray-500 uppercase">
+                Documento
+              </label>
+              <input
+                value={form.documentId}
+                onChange={(e) =>
+                  setForm({ ...form, documentId: e.target.value })
+                }
+                placeholder="Documento"
+                className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+              />
+              <div className="mb-3 grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Telefono
+                  </label>
+                  <input
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
+                    placeholder="Telefono"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Email
+                  </label>
+                  <input
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    placeholder="Email"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+            {error && <p className="mb-2 text-xs text-red-400">{error}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                Guardar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
