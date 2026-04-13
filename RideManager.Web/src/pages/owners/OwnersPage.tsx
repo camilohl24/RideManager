@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import { createOwner, getOwners, updateOwner } from '@/services/ownerService'
+import {
+  createOwner,
+  deleteOwner,
+  getOwners,
+  updateOwner,
+} from '@/services/ownerService'
 import { type OwnerResponse } from '@/types/api'
 import { Card } from '@/components/ui/card'
 import {
@@ -19,6 +24,9 @@ export default function OwnersPage() {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedOwner, setSelectedOwner] = useState<OwnerResponse | null>(null)
   const [editOwner, setEditOwner] = useState<OwnerResponse | null>(null)
+  const [ownerTODelete, setOwnerToDelete] = useState<OwnerResponse | null>(null)
+  const [search, setSearch] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -26,8 +34,12 @@ export default function OwnersPage() {
     phone: '',
     email: '',
   })
-  const [error, setError] = useState<string | null>(null)
 
+  const filterdOwners = owners.filter(
+    (o) =>
+      o.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      o.documentId.includes(search)
+  )
   useEffect(() => {
     async function fetchData() {
       try {
@@ -67,6 +79,17 @@ export default function OwnersPage() {
     }
   }
 
+  async function handleDelete(id: number) {
+    try {
+      await deleteOwner(id)
+      const update = await getOwners()
+      setOwners(update)
+      setOwnerToDelete(null)
+    } catch (error) {
+      console.error('Error al borrar el usuario', error)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -81,6 +104,7 @@ export default function OwnersPage() {
             <span className="text-xs text-gray-500">🔍</span>
             <input
               placeholder="Buscar por nombre o documento..."
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full border-none bg-transparent text-xs text-gray-400 outline-none placeholder:text-gray-600"
             />
           </div>
@@ -131,7 +155,7 @@ export default function OwnersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {owners.map((owner) => (
+                {filterdOwners.map((owner) => (
                   <TableRow
                     key={owner.id}
                     className="border-[#2a2d3a] hover:bg-white/5"
@@ -186,7 +210,10 @@ export default function OwnersPage() {
                         >
                           Editar
                         </button>
-                        <button className="text-xs text-red-500 hover:text-red-400">
+                        <button
+                          onClick={() => setOwnerToDelete(owner)}
+                          className="text-xs text-red-500 hover:text-red-400"
+                        >
                           Eliminar
                         </button>
                       </div>
@@ -358,6 +385,37 @@ export default function OwnersPage() {
                 className="bg-orange-500 text-white hover:bg-orange-600"
               >
                 Guardar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {ownerTODelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-95 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-2 text-sm font-semibold text-white">
+              Eliminar cliente?
+            </h2>
+            <p className="mb-6 text-xs text-gray-500">
+              Esta accion eliminara permanente a{' '}
+              <span className="font-medium text-white">
+                {ownerTODelete.fullName}
+              </span>
+              . No se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setOwnerToDelete(null)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDelete(ownerTODelete.id)}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
               </Button>
             </div>
           </div>

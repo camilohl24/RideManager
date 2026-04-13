@@ -1,6 +1,4 @@
 ﻿using RideManager.Api.Models;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RideManager.Api.DTOs;
 
@@ -15,8 +13,8 @@ public class WorkOrderResponseDto
     public int Id { get; set; }
     public string LicensePlate { get; set; } = null!;
     public List<int> NotesId { get; set; } = new();
-    public WorkOrderStatus Status { get; set; } = WorkOrderStatus.Pending;
     public string OwnerName { get; set; } = null!;
+    public WorkOrderStatus Status { get; set; } = WorkOrderStatus.Pending;
 }
 
 public class WorkOrderRequestDto

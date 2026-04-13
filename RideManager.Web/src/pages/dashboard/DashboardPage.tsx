@@ -208,7 +208,7 @@ export default function DashboardPage() {
           </p>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-white/5">
                 <TableHead className="text-gray-400">Nro.</TableHead>
                 <TableHead className="text-gray-400">Fecha</TableHead>
                 <TableHead className="text-gray-400">Moto</TableHead>
@@ -220,7 +220,10 @@ export default function DashboardPage() {
             </TableHeader>
             <TableBody>
               {workOrders.slice(0, 5).map((order) => (
-                <TableRow key={order.id} className="border-[#2a2d3a]">
+                <TableRow
+                  key={order.id}
+                  className="border-[#2a2d3a] hover:bg-white/5"
+                >
                   <TableCell className="text-gray-300">{order.id}</TableCell>
                   <TableCell className="text-gray-300">
                     {new Date(order.createdAt).toLocaleDateString('es-CO')}

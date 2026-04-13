@@ -14,3 +14,6 @@ export async function createOwner(data: OwnerRequest): Promise<OwnerResponse> {
 export async function updateOwner(id: number, data: OwnerRequest): Promise<void> {
     await api.put(`/owners/${id}`, data)
 }
+export async function deleteOwner(id: number,): Promise<void> {
+    await api.delete(`/owners/${id}`)
+}
