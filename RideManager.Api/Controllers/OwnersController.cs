@@ -12,23 +12,13 @@ namespace RideManager.Api.Controllers;
 [Route("api/[controller]")]
 public class OwnersController : ControllerBase
 {
-
     private readonly AppDbContext _context;
 
     public OwnersController(AppDbContext context)
     {
         _context = context;
     }
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<OwnerResponseDto>>> GetOwners()
-    {
-        var owners = await _context.Owners
-        .Include(o => o.Motorcycles)
-        .ToListAsync();
 
-        return owners.Select(MapToDto).ToList();
-
-    }
     [HttpPost]
     public async Task<ActionResult<OwnerResponseDto>> CreateOwner(OwnerRequestDto dto)
     {
@@ -44,22 +34,30 @@ public class OwnersController : ControllerBase
             };
             _context.Owners.Add(owner);
             await _context.SaveChangesAsync();
+            var result = await _context.Owners
+       .Include(O => O.Motorcycles)
+       .FirstOrDefaultAsync(o => o.Id == owner.Id);
+            return MapToDto(result!);
         }
         catch (DbUpdateException ex)
         {
-            if(ex.InnerException?.Message.Contains("DocumentId") == true)
+            if (ex.InnerException?.Message.Contains("DocumentId") == true)
             {
                 return BadRequest("Ya existe cliente con ese numero de documento");
             }
             return BadRequest("Error al crear el cliente intenta de nuevo");
         }
+    }
 
-      
-
-        var result = await _context.Owners
-            .Include(O => O.Motorcycles)
-            .FirstOrDefaultAsync(o => o.Id == owner.Id);
-      return  MapToDto(result!);
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteOwner(int id)
+    {
+        var owner = await _context.Owners.FindAsync(id);
+        if (owner == null)
+            return NotFound();
+        _context.Owners.Remove(owner);
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 
     [HttpGet("{id}")]
@@ -73,9 +71,18 @@ public class OwnersController : ControllerBase
         return MapToDto(owner);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<OwnerResponseDto>>> GetOwners()
+    {
+        var owners = await _context.Owners
+        .Include(o => o.Motorcycles)
+        .ToListAsync();
+
+        return owners.Select(MapToDto).ToList();
+    }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateOwner (int id, OwnerRequestDto dto)
+    public async Task<IActionResult> UpdateOwner(int id, OwnerRequestDto dto)
     {
         var owner = await _context.Owners.FindAsync(id);
         if (owner == null)
@@ -85,17 +92,6 @@ public class OwnersController : ControllerBase
         owner.LastName = dto.LastName;
         owner.Email = dto.Email;
         owner.Phone = dto.Phone;
-        await _context.SaveChangesAsync();
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOwner(int id)
-    {
-        var owner = await _context.Owners.FindAsync(id);
-        if (owner == null)
-            return NotFound();
-        _context.Owners.Remove(owner);
         await _context.SaveChangesAsync();
         return NoContent();
     }

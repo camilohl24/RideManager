@@ -52,6 +52,7 @@ export default function OwnersPage() {
 
   async function handleSubmit() {
     try {
+      setError(null)
       if (editOwner) {
         await updateOwner(editOwner.id, form)
       } else {
@@ -86,6 +87,7 @@ export default function OwnersPage() {
           <Button
             onClick={() => {
               setEditOwner(null)
+              setError(null)
               setForm({
                 firstName: '',
                 lastName: '',
@@ -167,6 +169,7 @@ export default function OwnersPage() {
                         <button
                           onClick={() => {
                             setEditOwner(owner)
+                            setError(null)
                             setForm({
                               firstName: owner.fullName.split(' ')[0],
                               lastName: owner.fullName
