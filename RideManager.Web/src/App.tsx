@@ -4,6 +4,7 @@ import DashboardPage from './pages/dashboard/DashboardPage'
 import OwnersPage from './pages/owners/OwnersPage'
 import MainLayout from './layouts/MainLayout'
 import { useAuthStore } from './store/authStore'
+import MotorcyclesPage from './pages/motorcycles/MotorcyclesPage'
 function App() {
   const token = useAuthStore((state) => state.token)
 
@@ -14,6 +15,7 @@ function App() {
         <Route element={token ? <MainLayout /> : <Navigate to="/login" />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/owners" element={<OwnersPage />} />
+          <Route path="/motorcycles" element={<MotorcyclesPage />} />
         </Route>
         <Route
           path="*"

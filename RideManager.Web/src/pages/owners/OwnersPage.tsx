@@ -57,7 +57,7 @@ export default function OwnersPage() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-gray-500">Cargando</p>
+        <p className="text-sm text-gray-500">Cargando...</p>
       </div>
     )
   }
