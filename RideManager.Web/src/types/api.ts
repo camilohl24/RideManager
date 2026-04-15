@@ -89,3 +89,11 @@ export interface OwnerRequest {
     lastName: string
     phone: string
 }
+
+export interface MotorcycleRequest {
+    brand: string
+    licensePlate: string
+    model: number
+    ownerId: number
+    reference: string
+}

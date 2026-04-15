@@ -75,7 +75,7 @@ export default function OwnersPage() {
       setShowModal(false)
       setEditOwner(null)
     } catch (error: any) {
-      setError(error.Response?.data ?? 'Error al guardar')
+      setError(error.response?.data ?? 'Error al guardar')
     }
   }
 

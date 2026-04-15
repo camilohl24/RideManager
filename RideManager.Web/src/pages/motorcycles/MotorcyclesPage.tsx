@@ -177,6 +177,58 @@ export default function MotorcyclesPage() {
             </Table>
           </Card>
         </div>
+        {selectedMotorcyle && (
+          <div className="w-60 shrink-0">
+            <Card className="border-[#2a2d3a] bg-[#181b26] p-4">
+              <div className="mb-4 flex items-center gap-3 border-b border-[#2a2d3a] pb-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-sm text-orange-400 uppercase">
+                  {selectedMotorcyle.licensePlate.slice(0, 2)}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">
+                    {selectedMotorcyle.licensePlate}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {selectedMotorcyle.brand} {selectedMotorcyle.reference}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">Marca</p>
+                  <p className="tex-xs text-gray-300">
+                    {selectedMotorcyle.brand}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">
+                    Referencia
+                  </p>
+                  <p className="tex-xs truncate text-gray-300">
+                    {selectedMotorcyle.reference}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">Modelo</p>
+                  <p className="tex-xs truncate text-gray-300">
+                    {selectedMotorcyle.model}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">
+                    Registrada desde
+                  </p>
+                  <p className="tex-xs truncate text-gray-300">
+                    {new Date(selectedMotorcyle.createdAt).toLocaleDateString(
+                      'es-CO',
+                      { month: 'short', year: 'numeric' }
+                    )}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   )
