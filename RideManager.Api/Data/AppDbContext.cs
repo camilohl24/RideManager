@@ -22,5 +22,22 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.Role)
             .HasConversion<string>();
+
+        modelBuilder.Entity<Motorcycle>()
+           .HasMany(m => m.WorkOrders)
+           .WithOne(w => w.Motorcycle)
+           .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkOrder>()
+          .HasMany(w => w.Notes)
+          .WithOne(n => n.WorkOrder)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Appointment>()
+            .HasOne(a => a.Motorcycle)
+            .WithMany()
+            .HasForeignKey(a => a.MotorcycleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

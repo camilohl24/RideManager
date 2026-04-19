@@ -49,7 +49,10 @@ public class MotorcyclesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteMotorcycle(int id)
     {
-        var motorcycle = await _context.Motorcycles.FindAsync(id);
+
+        var motorcycle = await _context.Motorcycles
+            .Include(m => m.WorkOrders)
+            .FirstOrDefaultAsync(m => m.Id == id);
         if (motorcycle == null)
             return NotFound();
         _context.Motorcycles.Remove(motorcycle);
