@@ -3,6 +3,7 @@ import { getWorkOrders } from '@/services/workOrderService'
 import { getOwners } from '@/services/ownerService'
 import { getMechanics } from '@/services/mechanicService'
 import { getMotorcycles } from '@/services/motorcycleService'
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   type MechanicResponse,
@@ -69,6 +70,7 @@ export default function DashboardPage() {
     fetchData()
   }, [])
 
+  const navigate = useNavigate()
   const activeOrders = workOrders.filter(
     (o) =>
       o.status !== WorkOrderStatus.Done &&
@@ -262,7 +264,10 @@ export default function DashboardPage() {
             <Button className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white">
               📋 Nueva orden
             </Button>
-            <Button className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white">
+            <Button
+              onClick={() => navigate('/owners?action=new')}
+              className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white"
+            >
               👤 Registrar cliente
             </Button>
             <Button className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white">

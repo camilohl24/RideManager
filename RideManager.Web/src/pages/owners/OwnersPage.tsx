@@ -7,6 +7,7 @@ import {
 } from '@/services/ownerService'
 import { type OwnerResponse } from '@/types/api'
 import { Card } from '@/components/ui/card'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   Table,
   TableBody,
@@ -35,11 +36,21 @@ export default function OwnersPage() {
     email: '',
   })
 
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+
   const filterdOwners = owners.filter(
     (o) =>
       o.fullName.toLowerCase().includes(search.toLowerCase()) ||
       o.documentId.includes(search)
   )
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true)
+    }
+  }, [searchParams])
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -69,6 +80,10 @@ export default function OwnersPage() {
         await updateOwner(editOwner.id, form)
       } else {
         await createOwner(form)
+        if (searchParams.get('action') === 'new') {
+          navigate('/dashboard')
+          return
+        }
       }
       const update = await getOwners()
       setOwners(update)
@@ -375,7 +390,13 @@ export default function OwnersPage() {
             <div className="mt-4 flex justify-end gap-2">
               <Button
                 variant="ghost"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  if (searchParams.get('action') === 'new') {
+                    navigate('/dashboard')
+                    return
+                  }
+                  setShowModal(false)
+                }}
                 className="text-gray-400 hover:bg-white/10 hover:text-white"
               >
                 Cancelar
