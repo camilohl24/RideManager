@@ -39,5 +39,17 @@ public class AppDbContext : DbContext
             .HasForeignKey(a => a.MotorcycleId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<WorkOrder>()
+           .HasOne(w => w.Mechanic)
+           .WithMany()
+           .HasForeignKey(w => w.MechanicId)
+           .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Appointment>()
+          .HasOne(a => a.Mechanic)
+          .WithMany()
+          .HasForeignKey(a => a.MechanicId)
+          .OnDelete(DeleteBehavior.SetNull);
+
     }
 }
