@@ -97,3 +97,11 @@ export interface MotorcycleRequest {
     ownerId: number
     reference: string
 }
+export interface MechanicRequest {
+    documentId: string
+    email: string
+    firstName: string
+    lastName: string
+    phone: string
+    position: string
+}
