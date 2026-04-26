@@ -18,3 +18,8 @@ export async function updateWorkOrder(id: number, data: WorkOrderRequest): Promi
 export async function deleteWorkOrder(id: number): Promise<void> {
     await api.delete(`/workOrders/${id}`)
 }
+export async function updateWorkOrderStatus(id: number, status: string): Promise<void> {
+    await api.patch(`/workOrders/${id}/status`, JSON.stringify(status), {
+        headers: { 'Content-Type': 'application/json' }
+    })
+}

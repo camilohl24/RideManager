@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { getWorkOrders } from '@/services/workOrderService'
+import {
+  getWorkOrders,
+  updateWorkOrderStatus,
+} from '@/services/workOrderService'
 import {
   type WorkOrderResponse,
   type NotesResponse,
@@ -57,6 +60,20 @@ export default function WorkOrdersPage() {
     }
     fetchData()
   }, [])
+
+  async function handleStatusChange(newStatus: string) {
+    if (!selectedWorkOrder) return
+    try {
+      await updateWorkOrderStatus(selectedWorkOrder.id, newStatus)
+      const update = await getWorkOrders()
+      setWorkOrders(update)
+      setSelectedWorkOrder((prev) =>
+        prev ? { ...prev, status: newStatus as WorkOrderStatus } : null
+      )
+    } catch (error) {
+      console.error('Error al actualizar estado', error)
+    }
+  }
 
   const pending = workOrders.filter((o) => o.status === WorkOrderStatus.Pending)
   const inRepair = workOrders.filter(
@@ -255,6 +272,7 @@ export default function WorkOrdersPage() {
               </p>
               <select
                 value={selectedWorkOrder.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
                 className="mt-1 w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
               >
                 <option value="Pending">Pendiente</option>
