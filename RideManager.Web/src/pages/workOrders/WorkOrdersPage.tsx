@@ -278,7 +278,7 @@ export default function WorkOrdersPage() {
                 <option value="Pending">Pendiente</option>
                 <option value="InRepair">En reparacion</option>
                 <option value="ReadyForDelivery">Listo para entrega</option>
-                <option value="done">Finalizado</option>
+                <option value="Done">Finalizado</option>
               </select>
             </Card>
             <Card className="mt-3 overflow-visible border-[#2a2d3a] bg-[#181b26] p-4">
