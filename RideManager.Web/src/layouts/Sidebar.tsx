@@ -48,8 +48,8 @@ function NavItem({ label, path, icon }: NavItemProps) {
 export default function Sidebar() {
   const user = useAuthStore((s) => s.user)
   return (
-    <aside className="flex h-screen w-[185px] flex-shrink-0 flex-col border-r border-white/5 bg-[#13161e]">
-      <div className="flex h-[46px] flex-shrink-0 items-center border-b border-white/5 px-4">
+    <aside className="flex h-screen w-[185px] shrink-0 flex-col border-r border-white/5 bg-[#13161e]">
+      <div className="flex h-[46px] shrink-0 items-center border-b border-white/5 px-4">
         <span className="text-sm font-extrabold tracking-wider text-white">
           RIDE<span className="text-orange-500">MANAGER</span>
         </span>
@@ -82,7 +82,7 @@ export default function Sidebar() {
       {user && (
         <div className="mt-auto border-t border-white/5 px-3 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-[10px] font-bold text-orange-400 uppercase">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-[10px] font-bold text-orange-400 uppercase">
               {user?.userName.slice(0, 2)}
             </div>
             <div className="min-w-0">

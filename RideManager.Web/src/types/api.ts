@@ -105,3 +105,16 @@ export interface MechanicRequest {
     phone: string
     position: string
 }
+
+export interface NoteRequest {
+    description: string
+    workOrderId: number
+}
+
+export interface WorkOrderRequest {
+    description: string
+    diagnosis: string
+    cost: number
+    mechanicId: number
+    motorcycleId: number
+}

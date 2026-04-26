@@ -6,6 +6,7 @@ import MainLayout from './layouts/MainLayout'
 import { useAuthStore } from './store/authStore'
 import MotorcyclesPage from './pages/motorcycles/MotorcyclesPage'
 import MechanicsPage from './pages/mechanics/MechanicsPage'
+import WorkOrdersPage from './pages/workOrders/WorkOrdersPage'
 function App() {
   const token = useAuthStore((state) => state.token)
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/owners" element={<OwnersPage />} />
           <Route path="/motorcycles" element={<MotorcyclesPage />} />
           <Route path="/mechanics" element={<MechanicsPage />} />
+          <Route path="/workOrders" element={<WorkOrdersPage />} />
         </Route>
         <Route
           path="*"
