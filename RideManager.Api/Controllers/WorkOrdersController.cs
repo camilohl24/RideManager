@@ -99,7 +99,7 @@ public class WorkOrdersController : ControllerBase
             return NotFound();
         }
 
-        if (Enum.TryParse<WorkOrderStatus>(status, out var newStatus))
+        if (!Enum.TryParse<WorkOrderStatus>(status, out var newStatus))
         {
             return BadRequest("Estado invalido");
 
