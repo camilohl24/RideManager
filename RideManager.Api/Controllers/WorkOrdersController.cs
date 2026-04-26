@@ -90,6 +90,26 @@ public class WorkOrdersController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
+    {
+        var workOrder = await _context.WorkOrders.FindAsync(id);
+        if (workOrder == null)
+        {
+            return NotFound();
+        }
+
+        if (Enum.TryParse<WorkOrderStatus>(status, out var newStatus))
+        {
+            return BadRequest("Estado invalido");
+
+        }
+        workOrder.Status = newStatus;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+
     private IQueryable<WorkOrder> GetWorkOrdersWhithIncludes() =>
         _context.WorkOrders
         .Include(w => w.Notes)
