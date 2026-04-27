@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import {
+  createWorkOrder,
+  deleteWorkOrder,
   getWorkOrders,
+  updateWorkOrder,
   updateWorkOrderStatus,
 } from '@/services/workOrderService'
 import {
@@ -10,7 +13,6 @@ import {
   type MotorcycleResponse,
 } from '@/types/api'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { getMotorcycles } from '@/services/motorcycleService'
 import { getMechanics } from '@/services/mechanicService'
@@ -83,6 +85,29 @@ export default function WorkOrdersPage() {
     }
   }
 
+  async function handleSubmit() {
+    try {
+      setError(null)
+      const data = {
+        ...form,
+        cost: Number(form.cost),
+        mechanicId: Number(form.mechanicId),
+        motorcycleId: Number(form.motorcycleId),
+      }
+      if (editWorkOrder) {
+        await updateWorkOrder(editWorkOrder.id, data)
+      } else {
+        await createWorkOrder(data)
+      }
+      const update = await getWorkOrders()
+      setWorkOrders(update)
+      setShowModal(false)
+      setEditWorkOrder(null)
+    } catch (error: any) {
+      setError(error.response?.data ?? 'Error al guardar')
+    }
+  }
+
   async function handleStatusChange(newStatus: string) {
     if (!selectedWorkOrder) return
     try {
@@ -94,6 +119,16 @@ export default function WorkOrdersPage() {
       )
     } catch (error) {
       console.error('Error al actualizar estado', error)
+    }
+  }
+  async function handleDelete(id: number) {
+    try {
+      await deleteWorkOrder(id)
+      const update = await getWorkOrders()
+      setWorkOrders(update)
+      setWorkOrderToDelete(null)
+    } catch (error) {
+      console.error('Error al borrar la orden', error)
     }
   }
 
@@ -207,7 +242,7 @@ export default function WorkOrdersPage() {
                       <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/20 text-[8px] font-bold text-blue-400 uppercase">
                         {order.fullNameMechanic?.slice(0, 2)}
                       </div>
-                      <span className="text-[10px] text-gray-400">
+                      <span className="truncate text-[10px] text-gray-400">
                         {order.fullNameMechanic}
                       </span>
                       <span className="text-[10px] font-medium text-green-400">
@@ -221,7 +256,21 @@ export default function WorkOrdersPage() {
                       >
                         Ver
                       </button>
-                      <button className="text-[10px] text-blue-500 hover:text-blue-400">
+                      <button
+                        onClick={() => {
+                          setEditWorkOrder(order)
+                          setError(null)
+                          setForm({
+                            description: order.description,
+                            diagnosis: order.diagnosis,
+                            cost: String(order.cost),
+                            mechanicId: order.fullNameMechanic,
+                            motorcycleId: order.licensePlate,
+                          })
+                          setShowModal(true)
+                        }}
+                        className="text-[10px] text-blue-500 hover:text-blue-400"
+                      >
                         Editar
                       </button>
                       <button
@@ -337,6 +386,145 @@ export default function WorkOrdersPage() {
           </div>
         )}
       </div>
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-130 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-4 font-semibold text-white">
+              {editWorkOrder ? 'Editar Motocicleta' : 'Nueva Motocicleta'}
+            </h2>
+            <div className="flex flex-col gap-1">
+              <div className="mb-3 grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Descripcion
+                  </label>
+                  <input
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
+                    placeholder="Descripcion"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Diagnostico
+                  </label>
+                  <input
+                    value={form.diagnosis}
+                    onChange={(e) =>
+                      setForm({ ...form, diagnosis: e.target.value })
+                    }
+                    placeholder="Diagnostico"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="mb-3 grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-gray-500 uppercase">
+                      Mecanico
+                    </label>
+                    <select
+                      value={form.mechanicId}
+                      onChange={(e) =>
+                        setForm({ ...form, mechanicId: e.target.value })
+                      }
+                      className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                    >
+                      <option value="">Seleccionar mecanico</option>
+                      {mechanics.map((mechanic) => (
+                        <option key={mechanic.id} value={mechanic.id}>
+                          {mechanic.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-gray-500 uppercase">
+                      Placa
+                    </label>
+                    <select
+                      value={form.motorcycleId}
+                      onChange={(e) =>
+                        setForm({ ...form, motorcycleId: e.target.value })
+                      }
+                      className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                    >
+                      <option value="">Seleccionar placa</option>
+                      {motorcycles.map((motorcycle) => (
+                        <option key={motorcycle.id} value={motorcycle.id}>
+                          {motorcycle.licensePlate}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Valor servicio
+                  </label>
+                  <input
+                    value={form.cost}
+                    onChange={(e) => setForm({ ...form, cost: e.target.value })}
+                    placeholder="Costo"
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+            {error && <p className="mb-2 text-xs text-red-400">{error}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                Guardar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {workOrderToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-95 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-2 text-sm font-semibold text-white">
+              Eliminar Orden de trabajo?
+            </h2>
+            <p className="mb-6 text-xs text-gray-500">
+              Esta accion eliminara permanente a la orden de trabajo{' '}
+              <span className="font-medium text-white">
+                #{workOrderToDelete.id}
+              </span>
+              . No se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setWorkOrderToDelete(null)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDelete(workOrderToDelete.id)}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
