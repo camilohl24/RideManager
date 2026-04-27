@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { getMotorcycles } from '@/services/motorcycleService'
 import { getMechanics } from '@/services/mechanicService'
-import { getNotes } from '@/services/noteService'
+import { createNote, getNotes } from '@/services/noteService'
 import { WorkOrderStatus } from '@/types/enums'
 
 export default function WorkOrdersPage() {
@@ -22,6 +22,7 @@ export default function WorkOrdersPage() {
   const [mechanics, setMechanics] = useState<MechanicResponse[]>([])
   const [motorcycles, setMotorcycles] = useState<MotorcycleResponse[]>([])
   const [notes, setNotes] = useState<NotesResponse[]>([])
+  const [newNote, setNewNote] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedWorkOrder, setSelectedWorkOrder] =
@@ -60,6 +61,27 @@ export default function WorkOrdersPage() {
     }
     fetchData()
   }, [])
+
+  async function handleAddNote() {
+    if (!newNote.trim() || !selectedWorkOrder) return
+    try {
+      await createNote({
+        description: newNote,
+        workOrderId: selectedWorkOrder.id,
+      })
+      const [updatedNotes, updatedOrders] = await Promise.all([
+        getNotes(),
+        getWorkOrders(),
+      ])
+      setNotes(updatedNotes)
+      setWorkOrders(updatedOrders)
+      const updated = updatedOrders.find((o) => o.id === selectedWorkOrder.id)
+      if (updated) setSelectedWorkOrder(updated)
+      setNewNote('')
+    } catch (error) {
+      console.error('Error al agregar nota', error)
+    }
+  }
 
   async function handleStatusChange(newStatus: string) {
     if (!selectedWorkOrder) return
@@ -298,11 +320,16 @@ export default function WorkOrdersPage() {
               </div>
               <div className="mt-3 flex flex-col gap-2">
                 <textarea
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
                   placeholder="Agregar nota..."
                   rows={2}
                   className="flex-1 resize-none rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
                 />
-                <button className="shrink-0 rounded-md bg-orange-500 px-3 py-2 text-xs font-medium text-white hover:bg-orange-600">
+                <button
+                  onClick={handleAddNote}
+                  className="shrink-0 rounded-md bg-orange-500 px-3 py-2 text-xs font-medium text-white hover:bg-orange-600"
+                >
                   + Nota
                 </button>
               </div>
