@@ -126,6 +126,8 @@ public class WorkOrdersController : ControllerBase
         CreatedAt = w.CreatedAt,
         CompletedAt = w.CompletedAt,
         Cost = w.Cost,
+        MechanicId = w.MechanicId,
+        MotorcycleId = w.MotorcycleId,
         NotesId = w.Notes.Select(n => n.Id).ToList(),
         LicensePlate = w.Motorcycle != null ? w.Motorcycle.LicensePlate : null!,
         FullNameMechanic = w.Mechanic != null ? $"{w.Mechanic.FirstName} {w.Mechanic.LastName}" : null!,
