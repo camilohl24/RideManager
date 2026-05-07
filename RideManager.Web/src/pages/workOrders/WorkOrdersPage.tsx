@@ -264,8 +264,8 @@ export default function WorkOrdersPage() {
                             description: order.description,
                             diagnosis: order.diagnosis,
                             cost: String(order.cost),
-                            mechanicId: order.fullNameMechanic,
-                            motorcycleId: order.licensePlate,
+                            mechanicId: String(order.mechanicId),
+                            motorcycleId: String(order.motorcycleId),
                           })
                           setShowModal(true)
                         }}

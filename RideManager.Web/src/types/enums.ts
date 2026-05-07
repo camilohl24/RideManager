@@ -25,3 +25,11 @@ export const AppointmentType = {
 
 export type AppointmentType =
     (typeof AppointmentType)[keyof typeof AppointmentType]
+
+export const UserRole = {
+    Admin: 'Admin',
+    Mechanic: 'Mechanic',
+    Receptionist: 'Receptionist',
+} as const
+export type UserRole =
+    (typeof UserRole)[keyof typeof UserRole]

@@ -2,6 +2,7 @@ import type {
     WorkOrderStatus,
     AppointmentStatus,
     AppointmentType,
+    UserRole,
 } from './enums'
 
 export interface WorkOrderResponse {
@@ -11,6 +12,8 @@ export interface WorkOrderResponse {
     description: string
     diagnosis: string
     fullNameMechanic: string
+    mechanicId: number
+    motorcycleId: number
     id: number
     licensePlate: string
     notesId: number[]
@@ -80,6 +83,17 @@ export interface NotesResponse {
 
 export interface TokenResponse {
     token: string
+}
+
+export interface UserResponse {
+    id: number
+    userName: string
+    role: UserRole
+}
+export interface RegisterDTO {
+    userName: string
+    role: UserRole
+    password: string
 }
 
 export interface OwnerRequest {
