@@ -7,6 +7,7 @@ import { useAuthStore } from './store/authStore'
 import MotorcyclesPage from './pages/motorcycles/MotorcyclesPage'
 import MechanicsPage from './pages/mechanics/MechanicsPage'
 import WorkOrdersPage from './pages/workOrders/WorkOrdersPage'
+import UsersPage from './pages/users/UsersPage'
 function App() {
   const token = useAuthStore((state) => state.token)
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/motorcycles" element={<MotorcyclesPage />} />
           <Route path="/mechanics" element={<MechanicsPage />} />
           <Route path="/workOrders" element={<WorkOrdersPage />} />
+          <Route path="/users" element={<UsersPage />} />
         </Route>
         <Route
           path="*"
