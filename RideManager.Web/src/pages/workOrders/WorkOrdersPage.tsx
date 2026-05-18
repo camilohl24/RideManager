@@ -18,6 +18,7 @@ import { getMotorcycles } from '@/services/motorcycleService'
 import { getMechanics } from '@/services/mechanicService'
 import { createNote, getNotes } from '@/services/noteService'
 import { WorkOrderStatus } from '@/types/enums'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 
 export default function WorkOrdersPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrderResponse[]>([])
@@ -43,6 +44,15 @@ export default function WorkOrdersPage() {
     mechanicId: '',
     motorcycleId: '',
   })
+
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
@@ -98,6 +108,10 @@ export default function WorkOrdersPage() {
         await updateWorkOrder(editWorkOrder.id, data)
       } else {
         await createWorkOrder(data)
+        if (searchParams.get('action') === 'new') {
+          navigate('/dashboard')
+          return
+        }
       }
       const update = await getWorkOrders()
       setWorkOrders(update)
@@ -479,7 +493,13 @@ export default function WorkOrdersPage() {
             <div className="mt-4 flex justify-end gap-2">
               <Button
                 variant="ghost"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  if (searchParams.get('action') === 'new') {
+                    navigate('/dashboard')
+                    return
+                  }
+                  setShowModal(false)
+                }}
                 className="text-gray-400 hover:bg-white/10 hover:text-white"
               >
                 Cancelar

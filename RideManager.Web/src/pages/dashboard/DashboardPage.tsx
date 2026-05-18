@@ -261,7 +261,10 @@ export default function DashboardPage() {
             Accion rapida
           </p>
           <div className="flex flex-col gap-2">
-            <Button className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white">
+            <Button
+              onClick={() => navigate('/workOrders?action=new')}
+              className="h-8 w-full justify-start gap-2 border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 hover:text-white"
+            >
               📋 Nueva orden
             </Button>
             <Button
