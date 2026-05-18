@@ -229,13 +229,19 @@ export default function UsersPage() {
             </div>
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => setActiveModal('username')}
+                onClick={() => {
+                  setNewUserName(editUser.userName)
+                  setActiveModal('username')
+                }}
                 className="w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-left text-xs text-blue-400 hover:bg-white/5"
               >
                 @ Cambiar usuario
               </button>
               <button
-                onClick={() => setActiveModal('role')}
+                onClick={() => {
+                  setNewRole(editUser.role)
+                  setActiveModal('role')
+                }}
                 className="w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-left text-xs text-orange-400 hover:bg-white/5"
               >
                 ★ Cambiar rol
@@ -311,6 +317,93 @@ export default function UsersPage() {
               <Button
                 onClick={handleCreate}
                 className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                Guardar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-95 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-2 text-sm font-semibold text-white">
+              Eliminar usuario?
+            </h2>
+            <p className="mb-6 text-xs text-gray-500">
+              Esta accion eliminara permanente a{' '}
+              <span className="font-medium text-white">
+                {userToDelete.userName}
+              </span>
+              . No se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setUserToDelete(null)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDelete(userToDelete.id)}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-130 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-4 text-sm font-semibold text-white">
+              {activeModal === 'username' && 'Cambiar usuario'}
+              {activeModal === 'password' && 'Cambiar contraseña'}
+              {activeModal === 'role' && 'Cambiar rol'}
+            </h2>
+            {activeModal === 'username' && (
+              <input
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+                placeholder="Nuevo usuario"
+                className="w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+              />
+            )}
+            {activeModal === 'role' && (
+              <select
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+                className="w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+              >
+                <option value="">Seleccione Rol</option>
+                <option value="Admin">Admistrador</option>
+                <option value="Mechanic">Mecanico</option>
+                <option value="Recepcionist">Recepcionista</option>
+              </select>
+            )}
+            {activeModal === 'password' && (
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Nueva contraseña"
+                className="w-full rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+              />
+            )}
+            {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveModal(null)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="bg-orange-500 text-white hover:bg-orange-700"
               >
                 Guardar
               </Button>
