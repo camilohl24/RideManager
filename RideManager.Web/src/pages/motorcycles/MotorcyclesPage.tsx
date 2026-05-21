@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getOwners } from '@/services/ownerService'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   createMotorcycle,
   deleteMotorcycle,
@@ -45,6 +45,13 @@ export default function MotorcyclesPage() {
     m.licensePlate.toLowerCase().includes(search.toLowerCase())
   )
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
@@ -74,6 +81,10 @@ export default function MotorcyclesPage() {
         await updateMotorcycle(editMotorcyle.id, data)
       } else {
         await createMotorcycle(data)
+        if (searchParams.get('action') === 'new') {
+          navigate('/dashboard')
+          return
+        }
       }
       const update = await getMotorcycles()
       setMotorcycles(update)
@@ -409,7 +420,13 @@ export default function MotorcyclesPage() {
             <div className="mt-4 flex justify-end gap-2">
               <Button
                 variant="ghost"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  if (searchParams.get('action') === 'new') {
+                    navigate('/dashboard')
+                    return
+                  }
+                  setShowModal(false)
+                }}
                 className="text-gray-400 hover:bg-white/10 hover:text-white"
               >
                 Cancelar
