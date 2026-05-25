@@ -104,6 +104,20 @@ public class AppointmentsController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] string status)
+    {
+        var appointment = await _context.Appointments.FindAsync(id);
+        if (appointment == null) return NotFound();
+        if (!Enum.TryParse<AppointmentStatus>(status, out var newEstatus))
+        {
+            return BadRequest("Estado de cita no válido");
+        }
+
+        appointment.Status = newEstatus;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 
     private IQueryable<Appointment> GetAppointmentsWhithIncludes() =>
         _context.Appointments
