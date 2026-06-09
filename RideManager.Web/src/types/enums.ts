@@ -19,7 +19,7 @@ export type AppointmentStatus =
     (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
 
 export const AppointmentType = {
-    Sheduled: 'Sheduled',
+    Sheduled: 'Scheduled',
     Walkin: 'Walkin',
 } as const
 

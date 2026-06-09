@@ -1,5 +1,4 @@
 ﻿using RideManager.Api.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace RideManager.Api.DTOs;
 

@@ -132,3 +132,14 @@ export interface WorkOrderRequest {
     mechanicId: number
     motorcycleId: number
 }
+
+export interface AppointmentRequest {
+    contactName: string | null
+    contactPhone: string | null
+    mechanicId: number | null
+    motorcycleId: number | null
+    ownerId: number | null
+    reason: string
+    type: AppointmentType
+    scheduledAt?: string
+}

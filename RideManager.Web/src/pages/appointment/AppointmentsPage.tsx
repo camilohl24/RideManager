@@ -4,26 +4,52 @@ import { Card } from '@/components/ui/card'
 import { type AppointmentResponse } from '@/types/api'
 import { getAppointments } from '@/services/appointmentService'
 
+const getMonday = (date: Date): Date => {
+  const monday = new Date(date)
+  monday.setDate(date.getDate() - date.getDay() + 1)
+  return monday
+}
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
+    getMonday(new Date())
+  )
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [search, setSearch] = useState<string>('')
   const [showModal, setShowModal] = useState<boolean>(false)
 
-  const today = new Date() // what date is today
-  const weekDay = today.getDay() // day of today
-  const monday = new Date(today) // create a copy today
-  monday.setDate(today.getDate() - weekDay + 1) // look for monday
-
   const weekDays = Array.from({ length: 5 }, (_, i) => {
-    const day = new Date(monday)
-    day.setDate(monday.getDate() + i)
+    const day = new Date(currentWeekStart)
+    day.setDate(currentWeekStart.getDate() + i)
+    return day
+  })
+  const goToPreviousWeek = () => {
+    const prev = new Date(currentWeekStart)
+    prev.setDate(prev.getDate() - 7)
+    setCurrentWeekStart(prev)
+  }
 
-    return day.toLocaleDateString('es-CO', {
-      weekday: 'long',
-    })
-  }) // show days of week
+  const goToNextWeek = () => {
+    const next = new Date(currentWeekStart)
+    next.setDate(next.getDate() + 7)
+    setCurrentWeekStart(next)
+  }
+
+  const getAppointmentsForDay = (day: Date) => {
+    return appointments.filter(
+      (a) =>
+        a.scheduledAt &&
+        new Date(a.scheduledAt).toDateString() === day.toDateString() &&
+        a.type === 'Scheduled'
+    )
+  }
+
+  const todayWalkins = appointments.filter(
+    (a) =>
+      a.type === 'Walkin' &&
+      new Date(a.createdAt).toDateString() === new Date().toDateString()
+  )
 
   useEffect(() => {
     async function fetchData() {
@@ -38,4 +64,6 @@ export default function AppointmentsPage() {
     }
     fetchData()
   }, [])
+
+  return <div className="flex h-full gap-4"></div>
 }
