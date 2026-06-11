@@ -45,7 +45,8 @@ public class AppointmentsController : ControllerBase
             Status = AppointmentStatus.Pending,
             TurnNumber = newTurn,
             CreatedAt = DateTime.Now,
-            Type = dto.Type
+            Type = dto.Type,
+            ScheduledAt = dto.ScheduledAt
         };
         _context.Appointments.Add(appointmet);
         await _context.SaveChangesAsync();
@@ -101,6 +102,7 @@ public class AppointmentsController : ControllerBase
         appointment.Reason = dto.Reason;
         appointment.Status = AppointmentStatus.Pending;
         appointment.Type = dto.Type;
+        appointment.ScheduledAt = dto.ScheduledAt;
         await _context.SaveChangesAsync();
         return NoContent();
     }

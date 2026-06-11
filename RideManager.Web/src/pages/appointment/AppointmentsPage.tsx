@@ -73,6 +73,14 @@ export default function AppointmentsPage() {
     fetchData()
   }, [])
 
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-gray-500">Cargando...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -156,8 +164,6 @@ export default function AppointmentsPage() {
             )
           })}
         </div>
-
-        {/* Walk-ins del día */}
         <div className="border-border rounded-lg border p-3">
           <div className="mb-3 flex items-center gap-2">
             <p className="text-sm font-medium text-white">
@@ -200,6 +206,77 @@ export default function AppointmentsPage() {
           )}
         </div>
       </div>
+      {selectedAppointment && (
+        <div className="border-border flex w-72 shrink-0 flex-col gap-4 self-start rounded-lg border p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-muted-foreground mb-1 text-xs tracking-wide uppercase">
+                {selectedAppointment.type === 'Walkin'
+                  ? `Walk-in · Turno ${selectedAppointment.turnNumber}`
+                  : 'Cita agendada'}
+              </p>
+              <p className="text-base font-medium">
+                {selectedAppointment.fullNameOwner ??
+                  selectedAppointment.contactName}
+              </p>
+            </div>
+            <button
+              onClick={() => setSelectedAppointment(null)}
+              className="text-muted-foreground border-border rounded border p-1 text-xs"
+            >
+              X
+            </button>
+          </div>
+
+          <div className="bg-border h-px" />
+
+          <div className="flex flex-col gap-2 text-xs">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Mecanico</span>
+              <span className="font-medium">
+                {selectedAppointment.fullNameMechanic ?? '-'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Telefono</span>
+              <span className="font-medium">
+                {selectedAppointment.contactPhone ?? '-'}
+              </span>
+            </div>
+            <div className="bg-card border-border text-muted-foreground rounded border p-2">
+              {selectedAppointment.reason}
+            </div>
+          </div>
+
+          <div className="bg-border h-px" />
+
+          <div className="flex flex-col gap-2">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              Cambiar estado
+            </p>
+            <select className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm">
+              <option value="Pending">Pendiente</option>
+              <option value="Confirmed">Confirmada</option>
+              <option value="Cancelled">Cancelada</option>
+              <option value="Completed">Completada</option>
+            </select>
+            <Button size="sm" className="w-full">
+              Guardar estado
+            </Button>
+          </div>
+
+          <div className="bg-border h-px" />
+
+          <div className="flex flex-col gap-2">
+            <Button variant="outline" size="sm" className="w-full">
+              Editar cita
+            </Button>
+            <Button variant="destructive" size="sm" className="w-full">
+              Eliminar cita
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
