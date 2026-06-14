@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { type AppointmentResponse } from '@/types/api'
-import { getAppointments } from '@/services/appointmentService'
+import {
+  getAppointments,
+  updateAppointment,
+  updateAppointmentStatus,
+} from '@/services/appointmentService'
+import type { AppointmentStatus } from '@/types/enums'
 
 const getMonday = (date: Date): Date => {
   const monday = new Date(date)
@@ -18,6 +23,7 @@ export default function AppointmentsPage() {
     useState<AppointmentResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
+  const [selectedStatus, setSelectedStatus] = useState<string>('')
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const day = new Date(currentWeekStart)
@@ -137,7 +143,10 @@ export default function AppointmentsPage() {
                   dayAppointments.map((apt) => (
                     <div
                       key={apt.id}
-                      onClick={() => setSelectedAppointment(apt)}
+                      onClick={() => {
+                        setSelectedAppointment(apt)
+                        setSelectedStatus(apt.status)
+                      }}
                       className={`hover:border-border/80 cursor-pointer rounded-lg border p-2 transition-colors ${selectedAppointment?.id === apt.id ? 'border-orange-500' : 'border-border bg-card'}`}
                     >
                       <p className="text-xs font-medium text-orange-400">
@@ -151,6 +160,25 @@ export default function AppointmentsPage() {
                       <p className="text-xs font-medium">
                         {apt.fullNameOwner ?? apt.contactName}
                       </p>
+                      <span
+                        className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs ${
+                          apt.status === 'Pending'
+                            ? 'bg-yellow-950 text-yellow-500'
+                            : apt.status === 'Confirmed'
+                              ? 'bg-blue-950 text-blue-500'
+                              : apt.status === 'Completed'
+                                ? 'bg-green-950 text-green-500'
+                                : 'bg-red-950 text-red-400'
+                        }`}
+                      >
+                        {apt.status === 'Pending'
+                          ? 'Pendiente'
+                          : apt.status === 'Confirmed'
+                            ? 'Confirmada'
+                            : apt.status === 'Completed'
+                              ? 'Completada'
+                              : 'Cancelada'}
+                      </span>
                       <p className="text-muted-foreground text-xs">
                         {apt.licensePlate}
                       </p>
@@ -183,7 +211,10 @@ export default function AppointmentsPage() {
               {todayWalkins.map((apt) => (
                 <div
                   key={apt.id}
-                  onClick={() => setSelectedAppointment(apt)}
+                  onClick={() => {
+                    setSelectedAppointment(apt)
+                    setSelectedStatus(apt.status)
+                  }}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${selectedAppointment?.id === apt.id ? 'border-orange-500' : 'border-border bg-card'}`}
                 >
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-orange-500 bg-orange-950 text-xs font-medium text-orange-400">
@@ -193,6 +224,25 @@ export default function AppointmentsPage() {
                     <p className="text-xs font-medium">
                       {apt.fullNameOwner ?? apt.contactName}
                     </p>
+                    <span
+                      className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs ${
+                        apt.status === 'Pending'
+                          ? 'bg-yellow-950 text-yellow-500'
+                          : apt.status === 'Confirmed'
+                            ? 'bg-blue-950 text-blue-500'
+                            : apt.status === 'Completed'
+                              ? 'bg-green-950 text-green-500'
+                              : 'bg-red-950 text-red-400'
+                      }`}
+                    >
+                      {apt.status === 'Pending'
+                        ? 'Pendiente'
+                        : apt.status === 'Confirmed'
+                          ? 'Confirmada'
+                          : apt.status === 'Completed'
+                            ? 'Completada'
+                            : 'Cancelada'}
+                    </span>
                     <p className="text-muted-foreground text-xs">
                       {apt.licensePlate} · {apt.fullNameMechanic}
                     </p>
@@ -215,7 +265,7 @@ export default function AppointmentsPage() {
                   ? `Walk-in · Turno ${selectedAppointment.turnNumber}`
                   : 'Cita agendada'}
               </p>
-              <p className="text-base font-medium">
+              <p className="text-base font-medium text-white">
                 {selectedAppointment.fullNameOwner ??
                   selectedAppointment.contactName}
               </p>
@@ -233,13 +283,13 @@ export default function AppointmentsPage() {
           <div className="flex flex-col gap-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Mecanico</span>
-              <span className="font-medium">
+              <span className="font-medium text-white">
                 {selectedAppointment.fullNameMechanic ?? '-'}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Telefono</span>
-              <span className="font-medium">
+              <span className="font-medium text-white">
                 {selectedAppointment.contactPhone ?? '-'}
               </span>
             </div>
@@ -254,13 +304,38 @@ export default function AppointmentsPage() {
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Cambiar estado
             </p>
-            <select className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm"
+            >
               <option value="Pending">Pendiente</option>
               <option value="Confirmed">Confirmada</option>
               <option value="Cancelled">Cancelada</option>
               <option value="Completed">Completada</option>
             </select>
-            <Button size="sm" className="w-full">
+            <Button
+              onClick={async () => {
+                if (!selectedAppointment) return
+                await updateAppointmentStatus(
+                  selectedAppointment.id,
+                  selectedStatus
+                )
+                setAppointments(
+                  appointments.map((a) =>
+                    a.id === selectedAppointment.id
+                      ? { ...a, status: selectedStatus as AppointmentStatus }
+                      : a
+                  )
+                )
+                setSelectedAppointment({
+                  ...selectedAppointment,
+                  status: selectedStatus as AppointmentStatus,
+                })
+              }}
+              size="sm"
+              className="w-full"
+            >
               Guardar estado
             </Button>
           </div>
