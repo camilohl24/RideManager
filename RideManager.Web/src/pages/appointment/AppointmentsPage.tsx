@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { type AppointmentResponse } from '@/types/api'
 import {
+  type MechanicResponse,
+  type AppointmentRequest,
+  type AppointmentResponse,
+} from '@/types/api'
+import {
+  deleteAppointment,
   getAppointments,
   updateAppointment,
   updateAppointmentStatus,
 } from '@/services/appointmentService'
-import type { AppointmentStatus } from '@/types/enums'
+import { AppointmentType, type AppointmentStatus } from '@/types/enums'
+import { getMechanics } from '@/services/mechanicService'
 
 const getMonday = (date: Date): Date => {
   const monday = new Date(date)
@@ -24,6 +30,19 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedStatus, setSelectedStatus] = useState<string>('')
+  const [mechanics, setMechanics] = useState<MechanicResponse[]>([])
+  const [appointmentToDelete, setAppointmentToDelete] =
+    useState<AppointmentResponse | null>(null)
+  const [form, setForm] = useState<AppointmentRequest>({
+    contactName: '',
+    contactPhone: '',
+    mechanicId: 0,
+    motorcycleId: 0,
+    ownerId: 0,
+    reason: '',
+    type: AppointmentType.Scheduled,
+    scheduledAt: '',
+  })
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const day = new Date(currentWeekStart)
@@ -65,11 +84,25 @@ export default function AppointmentsPage() {
       new Date(a.createdAt).toDateString() === new Date().toDateString()
   )
 
+  async function handleDelete(id: number) {
+    try {
+      await deleteAppointment(id)
+      const update = await getAppointments()
+      setAppointments(update)
+      setAppointmentToDelete(null)
+      setSelectedAppointment(null)
+    } catch (error) {
+      console.error('Error al borrar la cita', error)
+    }
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
         const appointments = await getAppointments()
+        const mechanics = await getMechanics()
         setAppointments(appointments)
+        setMechanics(mechanics)
       } catch (error) {
         console.error('error al cargar los datos', error)
       } finally {
@@ -246,9 +279,6 @@ export default function AppointmentsPage() {
                     <p className="text-muted-foreground text-xs">
                       {apt.licensePlate} · {apt.fullNameMechanic}
                     </p>
-                    <span className="mt-1 inline-block rounded bg-yellow-950 px-1.5 py-0.5 text-xs text-yellow-500">
-                      Pendiente
-                    </span>
                   </div>
                 </div>
               ))}
@@ -346,9 +376,150 @@ export default function AppointmentsPage() {
             <Button variant="outline" size="sm" className="w-full">
               Editar cita
             </Button>
-            <Button variant="destructive" size="sm" className="w-full">
+            <Button
+              variant="destructive"
+              size="sm"
+              className="w-full"
+              onClick={() => setAppointmentToDelete(selectedAppointment)}
+            >
               Eliminar cita
             </Button>
+          </div>
+        </div>
+      )}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-130 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-4 font-semibold text-white">Nueva cita</h2>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] text-gray-500 uppercase">
+                  Tipo de cita
+                </label>
+                <select
+                  value={form.type}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      type: e.target.value as AppointmentType,
+                    })
+                  }
+                  className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                >
+                  <option value="">Selecionar tipo de cita</option>
+                  <option value="Scheduled">Programada</option>
+                  <option value="Walkin">Sin cita previa</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] text-gray-500 uppercase">
+                  Mecanico
+                </label>
+                <select
+                  value={form.mechanicId ?? ''}
+                  onChange={(e) =>
+                    setForm({ ...form, mechanicId: Number(e.target.value) })
+                  }
+                  className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                >
+                  <option value="">Seleccionar mecánico</option>
+                  {mechanics.map((mechanic) => (
+                    <option key={mechanic.id} value={mechanic.id}>
+                      {mechanic.fullName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] text-gray-500 uppercase">
+                  Razón
+                </label>
+                <textarea
+                  value={form.reason}
+                  onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                  className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  rows={3}
+                />
+              </div>
+              {form.type === 'Scheduled' && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] text-gray-500 uppercase">
+                    Fecha y hora
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={form.scheduledAt ?? ''}
+                    onChange={(e) =>
+                      setForm({ ...form, scheduledAt: e.target.value })
+                    }
+                    className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                  />
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] text-gray-500 uppercase">
+                  Nombre de contacto
+                </label>
+                <input
+                  type="text"
+                  value={form.contactName ?? ''}
+                  onChange={(e) =>
+                    setForm({ ...form, contactName: e.target.value })
+                  }
+                  className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] text-gray-500 uppercase">
+                  Telefóno contacto
+                </label>
+                <input
+                  type="text"
+                  value={form.contactPhone ?? ''}
+                  onChange={(e) =>
+                    setForm({ ...form, contactPhone: e.target.value })
+                  }
+                  className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
+                />
+              </div>
+              <div className="mt-4 justify-end gap-3">
+                <Button variant="ghost" onClick={() => setShowModal(false)}>
+                  Cancelar
+                </Button>
+                <Button>Guardar</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {appointmentToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60">
+          <div className="w-95 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
+            <h2 className="mb-2 text-sm font-semibold text-white">
+              Eliminar cita?
+            </h2>
+            <p className="p-6 text-xs text-gray-500">
+              Esta accionj elimiara permanente la cita de (' ')
+              <span className="font-medium text-white">
+                {appointmentToDelete.contactName}
+              </span>
+              . Nose puede deshacer.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="ghost"
+                onClick={() => setAppointmentToDelete(null)}
+                className="text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDelete(appointmentToDelete.id)}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
+              </Button>
+            </div>
           </div>
         </div>
       )}
