@@ -7,6 +7,7 @@ import {
   type AppointmentResponse,
 } from '@/types/api'
 import {
+  createAppointment,
   deleteAppointment,
   getAppointments,
   updateAppointment,
@@ -32,6 +33,9 @@ export default function AppointmentsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [mechanics, setMechanics] = useState<MechanicResponse[]>([])
   const [appointmentToDelete, setAppointmentToDelete] =
+    useState<AppointmentResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [editAppointment, setEditAppointmnet] =
     useState<AppointmentResponse | null>(null)
   const [form, setForm] = useState<AppointmentRequest>({
     contactName: '',
@@ -95,6 +99,23 @@ export default function AppointmentsPage() {
       console.error('Error al borrar la cita', error)
     }
   }
+  async function handleSubmit() {
+    try {
+      setError(null)
+      if (editAppointment) {
+        await updateAppointment(editAppointment.id, form)
+      } else {
+        createAppointment(form)
+      }
+
+      const update = await getAppointments()
+      setAppointments(update)
+      setShowModal(false)
+      setEditAppointmnet(null)
+    } catch (error: any) {
+      setError(error.response?.data ?? 'Error al guargar')
+    }
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -143,7 +164,24 @@ export default function AppointmentsPage() {
             <Button variant="outline" size="sm" onClick={goToNextWeek}>
               Siguiente →
             </Button>
-            <Button size="sm" onClick={() => setShowModal(true)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditAppointmnet(null)
+                setError(null)
+                setForm({
+                  contactName: '',
+                  contactPhone: '',
+                  mechanicId: 0,
+                  motorcycleId: 0,
+                  ownerId: 0,
+                  reason: '',
+                  type: AppointmentType.Scheduled,
+                  scheduledAt: '',
+                })
+                setShowModal(true)
+              }}
+            >
               + Nueva cita
             </Button>
           </div>
@@ -373,7 +411,26 @@ export default function AppointmentsPage() {
           <div className="bg-border h-px" />
 
           <div className="flex flex-col gap-2">
-            <Button variant="outline" size="sm" className="w-full">
+            <Button
+              onClick={() => {
+                setEditAppointmnet(selectedAppointment)
+                setError(null)
+                setForm({
+                  contactName: selectedAppointment.contactName,
+                  contactPhone: selectedAppointment.contactPhone,
+                  mechanicId: selectedAppointment.mechanicId,
+                  motorcycleId: selectedAppointment.motorcycleId,
+                  ownerId: selectedAppointment.ownerId,
+                  reason: selectedAppointment.reason,
+                  type: selectedAppointment.type,
+                  scheduledAt: selectedAppointment.scheduledAt ?? undefined,
+                })
+                setShowModal(true)
+              }}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
               Editar cita
             </Button>
             <Button
@@ -390,7 +447,9 @@ export default function AppointmentsPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="w-130 rounded-xl border border-[#2a2d3a] bg-[#181b26] p-6">
-            <h2 className="mb-4 font-semibold text-white">Nueva cita</h2>
+            <h2 className="mb-4 font-semibold text-white">
+              {editAppointment ? 'Editar cita' : 'Nueva cita'}
+            </h2>
             <div className="flex flex-col gap-1">
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] text-gray-500 uppercase">
@@ -482,11 +541,21 @@ export default function AppointmentsPage() {
                   className="rounded-md border border-[#2a2d3a] bg-[#0d0f14] px-3 py-2 text-xs text-gray-300 outline-none"
                 />
               </div>
+              {error && <p className="mb-2 text-xs text-red-400">{error}</p>}
               <div className="mt-4 justify-end gap-3">
-                <Button variant="ghost" onClick={() => setShowModal(false)}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:bg-white/10 hover:text-white"
+                >
                   Cancelar
                 </Button>
-                <Button>Guardar</Button>
+                <Button
+                  onClick={handleSubmit}
+                  className="bg-orange-500 text-white hover:bg-orange-600"
+                >
+                  Guardar
+                </Button>
               </div>
             </div>
           </div>

@@ -64,9 +64,12 @@ export interface AppointmentResponse {
     contactPhone: string | null
     createdAt: string
     fullNameMechanic: string | null
+    mechanicId: number
     fullNameOwner: string | null
+    ownerId: number
     id: number
     licensePlate: string | null
+    motorcycleId: number
     reason: string
     scheduledAt: string | null
     status: AppointmentStatus
