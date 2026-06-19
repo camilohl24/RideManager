@@ -102,13 +102,21 @@ export default function AppointmentsPage() {
   async function handleSubmit() {
     try {
       setError(null)
+      const dataToSend = {
+        ...form,
+        scheduledAt:
+          form.type === 'Walkin' ? undefined : form.scheduledAt || undefined,
+        ownerId: form.ownerId || null,
+        motorcycleId: form.motorcycleId || null,
+      }
       if (editAppointment) {
-        await updateAppointment(editAppointment.id, form)
+        await updateAppointment(editAppointment.id, dataToSend)
       } else {
-        createAppointment(form)
+        await createAppointment(dataToSend)
       }
 
       const update = await getAppointments()
+      console.log('appointments actualizados:', update)
       setAppointments(update)
       setShowModal(false)
       setEditAppointmnet(null)

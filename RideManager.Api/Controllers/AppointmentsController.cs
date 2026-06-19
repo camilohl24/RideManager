@@ -142,7 +142,8 @@ public class AppointmentsController : ControllerBase
         Reason = a.Reason,
         ScheduledAt = a.ScheduledAt,
         Status = a.Status,
-        TurnNumber = a.TurnNumber
+        TurnNumber = a.TurnNumber,
+        Type = a.Type
     };
 
     private async Task<string?> ValidateAppointmentFks(AppointmentRequestDto dto)
