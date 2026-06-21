@@ -98,8 +98,6 @@ El sistema centraliza toda la operación: desde que el cliente agenda una cita o
 
 ## 📸 Capturas de pantalla
 
-> *Agrega aquí una captura de cada página — recomendado 1280x720 o similar*
-
 ### Login
 ![Pantalla de login](./screenshots/login.png)
 
@@ -220,8 +218,6 @@ La API corre por defecto en `http://localhost:5000` y el frontend en `http://loc
 
 **Camilo Hernández**
 Desarrollador Full Stack en formación — C# · .NET · React · TypeScript
-
-[LinkedIn](#) · [GitHub](#) · [Correo](#)
 
 ---
 
