@@ -173,6 +173,7 @@ export default function AppointmentsPage() {
               Siguiente →
             </Button>
             <Button
+              className="bg-orange-400 text-white hover:bg-orange-600"
               size="sm"
               onClick={() => {
                 setEditAppointmnet(null)
@@ -264,6 +265,11 @@ export default function AppointmentsPage() {
                       <p className="text-muted-foreground truncate text-xs">
                         {apt.reason}
                       </p>
+                      {apt.status === 'Completed' && (
+                        <span className="text-muted-foreground ml-1">
+                          Turno: {apt.turnNumber}{' '}
+                        </span>
+                      )}
                     </div>
                   ))
                 )}
@@ -296,15 +302,17 @@ export default function AppointmentsPage() {
                   }}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${selectedAppointment?.id === apt.id ? 'border-orange-500' : 'border-border bg-card'}`}
                 >
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-orange-500 bg-orange-950 text-xs font-medium text-orange-400">
-                    {apt.turnNumber}
-                  </div>
                   <div>
-                    <p className="text-xs font-medium">
+                    <p className="text-xs font-bold text-orange-500 uppercase">
                       {apt.fullNameOwner ?? apt.contactName}
                     </p>
+                    {apt.status === 'Completed' && (
+                      <p className="text-xs font-bold text-orange-400 uppercase">
+                        Turno: {apt.turnNumber}
+                      </p>
+                    )}
                     <span
-                      className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs ${
+                      className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs uppercase ${
                         apt.status === 'Pending'
                           ? 'bg-yellow-950 text-yellow-500'
                           : apt.status === 'Confirmed'
@@ -322,8 +330,8 @@ export default function AppointmentsPage() {
                             ? 'Completada'
                             : 'Cancelada'}
                     </span>
-                    <p className="text-muted-foreground text-xs">
-                      {apt.licensePlate} · {apt.fullNameMechanic}
+                    <p className="text-xs text-orange-500 uppercase">
+                      {apt.licensePlate} {apt.fullNameMechanic}
                     </p>
                   </div>
                 </div>
@@ -336,7 +344,7 @@ export default function AppointmentsPage() {
         <div className="border-border flex w-72 shrink-0 flex-col gap-4 self-start rounded-lg border p-4">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-muted-foreground mb-1 text-xs tracking-wide uppercase">
+              <p className="mb-1 text-xs tracking-wide text-orange-500 uppercase">
                 {selectedAppointment.type === 'Walkin'
                   ? `Walk-in · Turno ${selectedAppointment.turnNumber}`
                   : 'Cita agendada'}
